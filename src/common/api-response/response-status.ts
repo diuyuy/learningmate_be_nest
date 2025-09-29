@@ -1,0 +1,239 @@
+import { HttpStatus } from '@nestjs/common';
+
+export enum ResponseCode {
+  OK = 'OK',
+
+  // 400 Bad Request
+  BAD_REQUEST = 'BAD_REQUEST',
+  AUTH_CODE_INVALID = 'AUTH_CODE_INVALID',
+  AUTH_TOKEN_INVALID = 'AUTH_TOKEN_INVALID',
+  DUPLICATE_NICKNAME = 'DUPLICATE_NICKNAME',
+  FILE_NAME_NOT_EXISTS = 'FILE_NAME_NOT_EXISTS',
+  INVALID_FILE_EXTENSION = 'INVALID_FILE_EXTENSION',
+  PROFILE_IMG_TOO_BIG = 'PROFILE_IMG_TOO_BIG',
+  INVALID_MEMBER_ID = 'INVALID_MEMBER_ID',
+
+  // 401 Unauthorized
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  INVALID_PASSWORD = 'INVALID_PASSWORD',
+  INVALID_REFRESH_TOKEN = 'INVALID_REFRESH_TOKEN',
+  INVALID_PIN = 'INVALID_PIN',
+  INVALID_AUTH_FORMAT = 'INVALID_AUTH_FORMAT',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  ACCESS_TOKEN_EXPIRED = 'ACCESS_TOKEN_EXPIRED',
+  GOOGLE_OAUTH_FAILURE = 'GOOGLE_OAUTH_FAILURE',
+
+  // 403 Forbidden
+  FORBIDDEN = 'FORBIDDEN',
+
+  // 404 Not Found
+  NOT_FOUND = 'NOT_FOUND',
+  MEMBER_NOT_FOUND = 'MEMBER_NOT_FOUND',
+  ARTICLE_NOT_FOUND = 'ARTICLE_NOT_FOUND',
+  REVIEW_NOT_FOUND = 'REVIEW_NOT_FOUND',
+  KEYWORD_NOT_FOUND = 'KEYWORD_NOT_FOUND',
+  KEYWORD_LIST_NOT_FOUND = 'KEYWORD_LIST_NOT_FOUND',
+  QUIZ_LIST_NOT_FOUND = 'QUIZ_LIST_NOT_FOUND',
+  VIDEO_BY_KEYWORD_ID_NOT_FOUND = 'VIDEO_BY_KEYWORD_ID_NOT_FOUND',
+  QUIZ_NOT_FOUND = 'QUIZ_NOT_FOUND',
+  ARTICLE_BY_KEYWORD_ID_NOT_FOUND = 'ARTICLE_BY_KEYWORD_ID_NOT_FOUND',
+  EMAIL_NOT_FOUND = 'EMAIL_NOT_FOUND',
+  CATEGORY_NOT_FOUND = 'CATEGORY_NOT_FOUND',
+  TERM_NOT_FOUND = 'TERM_NOT_FOUND',
+
+  // 409 Conflict
+  DUPLICATE_REVIEW = 'DUPLICATE_REVIEW',
+
+  // 500 Internal Server Error
+  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
+  SEND_EMAIL_FAIL = 'SEND_EMAIL_FAIL',
+  LOAD_IMAGE_FAIL = 'LOAD_IMAGE_FAIL',
+  SAVE_IMAGE_FAIL = 'SAVE_IMAGE_FAIL',
+}
+
+export class ResponseStatus {
+  readonly httpStatus: number;
+  readonly message: string;
+
+  constructor(httpStatus: number, message: string) {
+    this.httpStatus = httpStatus;
+    this.message = message;
+  }
+}
+
+export class ResponseStatusFactory {
+  private static readonly statusMap = {
+    [ResponseCode.OK]: {
+      httpStatus: HttpStatus.OK,
+      message: '요청이 성공적으로 처리되었습니다.',
+    },
+
+    // 400 Bad Request
+    [ResponseCode.BAD_REQUEST]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '잘못된 요청 형식입니다.',
+    },
+    [ResponseCode.AUTH_CODE_INVALID]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 인증코드 입니다.',
+    },
+    [ResponseCode.AUTH_TOKEN_INVALID]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 인증코드 입니다.',
+    },
+    [ResponseCode.DUPLICATE_NICKNAME]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '중복된 닉네임 입니다.',
+    },
+    [ResponseCode.FILE_NAME_NOT_EXISTS]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '파일명이 존재하지 않습니다.',
+    },
+    [ResponseCode.INVALID_FILE_EXTENSION]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 파일 확장자 입니다.',
+    },
+    [ResponseCode.PROFILE_IMG_TOO_BIG]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '프로필 이미지의 사이즈는 1MB 보다 작아야 합니다.',
+    },
+    [ResponseCode.INVALID_MEMBER_ID]: {
+      httpStatus: HttpStatus.BAD_REQUEST,
+      message: '해당 아이디를 가진 사용자가 존재하지 않습니다.',
+    },
+
+    // 401 Unauthorized
+    [ResponseCode.UNAUTHORIZED]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '인증이 필요합니다.',
+    },
+    [ResponseCode.INVALID_PASSWORD]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '비밀번호가 올바르지 않습니다.',
+    },
+    [ResponseCode.INVALID_REFRESH_TOKEN]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '유효하지 않은 Refresh Token입니다.',
+    },
+    [ResponseCode.INVALID_PIN]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: 'PIN 번호가 올바르지 않습니다.',
+    },
+    [ResponseCode.INVALID_AUTH_FORMAT]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '유효하지 않은 인증 요청 형식입니다.',
+    },
+    [ResponseCode.INVALID_TOKEN]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '유효하지 않은 토큰입니다.',
+    },
+    [ResponseCode.ACCESS_TOKEN_EXPIRED]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '액세스 토큰이 만료 됐습니다.',
+    },
+    [ResponseCode.GOOGLE_OAUTH_FAILURE]: {
+      httpStatus: HttpStatus.UNAUTHORIZED,
+      message: '구글 로그인 인증이 실패했습니다.',
+    },
+
+    // 403 Forbidden
+    [ResponseCode.FORBIDDEN]: {
+      httpStatus: HttpStatus.FORBIDDEN,
+      message: '요청 권한이 없습니다.',
+    },
+
+    // 404 Not Found
+    [ResponseCode.NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 자원입니다.',
+    },
+    [ResponseCode.MEMBER_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 회원입니다.',
+    },
+    [ResponseCode.ARTICLE_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 기사입니다.',
+    },
+    [ResponseCode.REVIEW_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 리뷰입니다.',
+    },
+    [ResponseCode.KEYWORD_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 키워드입니다.',
+    },
+    [ResponseCode.KEYWORD_LIST_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '해당 기간의 키워드가 존재하지 않습니다.',
+    },
+    [ResponseCode.QUIZ_LIST_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '퀴즈 목록이 존재하지 않습니다.',
+    },
+    [ResponseCode.VIDEO_BY_KEYWORD_ID_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '해당 키워드와 연관된 영상이 존재하지 않습니다.',
+    },
+    [ResponseCode.QUIZ_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '퀴즈가 존재하지 않습니다.',
+    },
+    [ResponseCode.ARTICLE_BY_KEYWORD_ID_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '해당 키워드와 연관된 기사가 존재하지 않습니다.',
+    },
+    [ResponseCode.EMAIL_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '해당 이메일을 가진 사용자가 존재하지 않습니다.',
+    },
+    [ResponseCode.CATEGORY_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 카테고리 입니다.',
+    },
+    [ResponseCode.TERM_NOT_FOUND]: {
+      httpStatus: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 용어 입니다.',
+    },
+
+    // 409 Conflict
+    [ResponseCode.DUPLICATE_REVIEW]: {
+      httpStatus: HttpStatus.CONFLICT,
+      message: '기사에 대한 리뷰를 이미 작성했습니다.',
+    },
+
+    // 500 Internal Server Error
+    [ResponseCode.INTERNAL_SERVER_ERROR]: {
+      httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '서버내부 오류입니다.',
+    },
+    [ResponseCode.SEND_EMAIL_FAIL]: {
+      httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '이메일 발송을 실패했습니다.',
+    },
+    [ResponseCode.LOAD_IMAGE_FAIL]: {
+      httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '이미지 로드를 실패했습니다.',
+    },
+    [ResponseCode.SAVE_IMAGE_FAIL]: {
+      httpStatus: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '이미지 저장을 실패했습니다.',
+    },
+  } as const;
+
+  static create(code: ResponseCode, customMessage?: string): ResponseStatus {
+    const config = this.statusMap[code];
+    return new ResponseStatus(
+      config.httpStatus,
+      customMessage || config.message,
+    );
+  }
+
+  static getHttpStatus(code: ResponseCode): number {
+    return this.statusMap[code].httpStatus;
+  }
+
+  static getMessage(code: ResponseCode): string {
+    return this.statusMap[code].message;
+  }
+}
