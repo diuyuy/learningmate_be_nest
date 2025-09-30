@@ -58,6 +58,8 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Claude & Mcp
 claude_contexts
 .serena
+CLAUDE.md
+
+# prisma
 /generated/prisma
 
-CLAUDE.md

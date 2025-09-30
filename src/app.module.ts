@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './features/auth/auth.module';
 import { ArticleModule } from './features/article/article.module';
 import { ReviewModule } from './features/review/review.module';
@@ -28,7 +26,7 @@ import { validateEnv } from './common/config/validate-env';
     StatisticModule,
     QuizModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
