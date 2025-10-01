@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  previewFeatures = ["typedSql"]
 }
 
 datasource db {
@@ -9,20 +10,20 @@ datasource db {
 }
 
 model Article {
-  id          BigInt    @id @default(autoincrement())
-  createdAt   DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  content     String    @db.Text
-  link        String    @db.VarChar(255)
-  press       String    @db.VarChar(30)
-  publishedAt DateTime  @db.Timestamp(6)
-  reporter    String    @db.VarChar(10)
-  scrapCount  BigInt    @default(0)
-  summary     String    @db.Text
-  title       String    @db.VarChar(255)
-  views       BigInt    @default(0)
+  id          BigInt   @id @default(autoincrement())
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  content     String   @db.Text
+  link        String   @db.VarChar(255)
+  press       String   @db.VarChar(30)
+  publishedAt DateTime @db.Timestamp(6)
+  reporter    String   @db.VarChar(10)
+  scrapCount  BigInt   @default(0)
+  summary     String   @db.Text
+  title       String   @db.VarChar(255)
+  views       BigInt   @default(0)
   keywordId   BigInt
-  keyword     Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKor8y5kscjrt38n1ddqh89o4s3")
+  keyword     Keyword  @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKor8y5kscjrt38n1ddqh89o4s3")
   quiz        Quiz[]
   review      Review[]
 
@@ -102,68 +103,69 @@ model Review {
   article    Article      @relation(fields: [articleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKgxst9s1m81taftxr9u79wqnxs")
   likeReview LikeReview[]
 
+  @@unique([memberId, articleId], name: "review_member_article")
   @@index([memberId], map: "FKdgh7i1rmiffemo1wxkea75tv3")
   @@index([articleId], map: "FKgxst9s1m81taftxr9u79wqnxs")
 }
 
 model Statistic {
-  id         BigInt    @id @default(autoincrement())
-  createdAt  DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  studyCount BigInt    @default(0)
+  id         BigInt   @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  studyCount BigInt   @default(0)
   categoryId BigInt
   memberId   BigInt
-  category   Category  @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK6687cpk12iic4o81ilqkxu04v")
-  member     Member    @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKdh51t3dh0ag5egixvegjwnj7d")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK6687cpk12iic4o81ilqkxu04v")
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKdh51t3dh0ag5egixvegjwnj7d")
 
   @@index([categoryId], map: "FK6687cpk12iic4o81ilqkxu04v")
   @@index([memberId], map: "FKdh51t3dh0ag5egixvegjwnj7d")
 }
 
 model Study {
-  id         BigInt    @id @default(autoincrement())
-  createdAt  DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  studyStats Int       @default(0) @db.TinyInt
+  id         BigInt   @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  studyStats Int      @default(0) @db.TinyInt
   keywordId  BigInt
   memberId   BigInt
-  member     Member    @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKe649b4utnj7k15p724xrnhuet")
-  keyword    Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKh9kqg6kindl5l651edqsuttf3")
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKe649b4utnj7k15p724xrnhuet")
+  keyword    Keyword  @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKh9kqg6kindl5l651edqsuttf3")
 
   @@index([memberId], map: "FKe649b4utnj7k15p724xrnhuet")
   @@index([keywordId], map: "FKh9kqg6kindl5l651edqsuttf3")
 }
 
 model TodaysKeyword {
-  id        BigInt    @id @default(autoincrement())
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  date      DateTime  @unique(map: "UKlgeus1t64dtgvkdlpx6h22tdh") @db.Date
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  date      DateTime @unique(map: "UKlgeus1t64dtgvkdlpx6h22tdh") @db.Date
   keywordId BigInt
-  keyword   Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKbag38p1orbpj7fpn33bf77raa")
+  keyword   Keyword  @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKbag38p1orbpj7fpn33bf77raa")
 
   @@index([keywordId], map: "FKbag38p1orbpj7fpn33bf77raa")
 }
 
 model Video {
-  id        BigInt    @id @default(autoincrement())
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  link      String    @db.VarChar(2048)
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  link      String   @db.VarChar(2048)
   keywordId BigInt
-  keyword   Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKm9n9p7beulerlb1jj05se00n2")
+  keyword   Keyword  @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKm9n9p7beulerlb1jj05se00n2")
 
   @@index([keywordId], map: "FKm9n9p7beulerlb1jj05se00n2")
 }
 
 model LikeReview {
-  id        BigInt    @id @default(autoincrement())
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp(6)
   memberId  BigInt
   reviewId  BigInt
-  review    Review    @relation(fields: [reviewId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK9rovxawis6ajfnvvpg901ghly")
-  member    Member    @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKcjiolh2ge79lmd5a69dvncyap")
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK9rovxawis6ajfnvvpg901ghly")
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKcjiolh2ge79lmd5a69dvncyap")
 
   @@unique([reviewId, memberId], map: "uk_like_review_review_member")
   @@index([memberId], map: "idx_like_review_member")
@@ -171,14 +173,14 @@ model LikeReview {
 }
 
 model MemberQuiz {
-  id           BigInt    @id @default(autoincrement())
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamp(6)
-  memberAnswer String    @db.VarChar(1)
+  id           BigInt   @id @default(autoincrement())
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  memberAnswer String   @db.VarChar(1)
   memberId     BigInt
   quizId       BigInt
-  quiz         Quiz      @relation(fields: [quizId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKb0gtuduybdgjjlxg2dxm1hs0i")
-  member       Member    @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKp2jthlaoh87gf17kcuxnvuce3")
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKb0gtuduybdgjjlxg2dxm1hs0i")
+  member       Member   @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKp2jthlaoh87gf17kcuxnvuce3")
 
   @@unique([quizId, memberId], map: "uk_member_quiz_quiz_member")
   @@index([memberId], map: "idx_mq_member")

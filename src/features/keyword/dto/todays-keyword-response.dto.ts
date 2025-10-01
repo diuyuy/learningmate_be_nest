@@ -13,6 +13,7 @@ export class TodaysKeywordResponseDto {
   }
 
   static from(
+    this: void,
     todaysKeyword: TodaysKeyword & { keyword: Keyword },
   ): TodaysKeywordResponseDto {
     return new TodaysKeywordResponseDto({

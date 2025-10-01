@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiResponse } from 'src/common/api-response/api-response';
 import {
   ResponseCode,
@@ -26,10 +26,5 @@ export class KeywordController {
       ResponseStatusFactory.create(ResponseCode.OK),
       articlePreviews,
     );
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.keywordService.remove(+id);
   }
 }

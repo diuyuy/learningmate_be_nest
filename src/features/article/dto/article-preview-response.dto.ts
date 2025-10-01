@@ -21,7 +21,7 @@ export class ArticlePreviewResponseDto {
     this.press = press;
   }
 
-  static from = (article: Article) => {
+  static from(this: void, article: Article) {
     return new ArticlePreviewResponseDto(article);
-  };
+  }
 }

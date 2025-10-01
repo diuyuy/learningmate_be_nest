@@ -1,26 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStudyDto } from './dto/create-study.dto';
-import { UpdateStudyDto } from './dto/update-study.dto';
+import {
+  ResponseCode,
+  ResponseStatusFactory,
+} from 'src/common/api-response/response-status';
+import { CommonException } from 'src/common/exception/common-exception';
+import { PrismaService } from 'src/common/prisma-module/prisma.service';
+import { MyStudyResponseDto } from './dto';
 
 @Injectable()
 export class StudyService {
-  create(createStudyDto: CreateStudyDto) {
-    return 'This action adds a new study';
-  }
+  constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return `This action returns all study`;
-  }
+  async getStudyStatus({
+    memberId,
+    year,
+    month,
+  }: {
+    memberId: bigint;
+    year: number;
+    month: number;
+  }) {
+    if (month < 1 || month > 12) {
+      throw new CommonException(
+        ResponseStatusFactory.create(ResponseCode.INVALID_MONTH_VALUE),
+      );
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} study`;
-  }
+    const start = new Date(year, month - 1, 1);
 
-  update(id: number, updateStudyDto: UpdateStudyDto) {
-    return `This action updates a #${id} study`;
-  }
+    const end = new Date(year, month, 1);
 
-  remove(id: number) {
-    return `This action removes a #${id} study`;
+    const studyStatus = await this.prismaService.study.findMany({
+      where: {
+        memberId,
+        createdAt: {
+          gte: start,
+          lt: end,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return studyStatus.map(MyStudyResponseDto.from);
   }
 }

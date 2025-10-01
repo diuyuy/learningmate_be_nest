@@ -13,7 +13,7 @@ export class MemberResponseDto {
     this.imageUrl = imageUrl;
   }
 
-  static from(member: Member): MemberResponseDto {
+  static from = (member: Member): MemberResponseDto => {
     return new MemberResponseDto(member);
-  }
+  };
 }

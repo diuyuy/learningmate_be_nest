@@ -4,7 +4,7 @@ export class PageReviewCountResponseDto {
   memberId: bigint;
   createdAt: Date;
   content1: string;
-  nickname: string;
+  nickname: string | null;
   title: string;
   likeCount: bigint;
   likedByMe: boolean;

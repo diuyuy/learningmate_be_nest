@@ -1,3 +1,5 @@
+import { Study } from 'generated/prisma';
+
 export class MyStudyResponseDto {
   id: bigint;
   keywordId: bigint;
@@ -32,11 +34,8 @@ export class MyStudyResponseDto {
   }
 
   static from(
-    id: bigint,
-    keywordId: bigint,
-    studyStats: number | null,
-    createdAt: Date,
-    updatedAt: Date,
+    this: void,
+    { id, keywordId, studyStats, createdAt, updatedAt }: Study,
   ): MyStudyResponseDto {
     const value = studyStats ?? 0;
 

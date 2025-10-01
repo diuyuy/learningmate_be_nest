@@ -13,6 +13,7 @@ export enum ResponseCode {
   PROFILE_IMG_TOO_BIG = 'PROFILE_IMG_TOO_BIG',
   INVALID_MEMBER_ID = 'INVALID_MEMBER_ID',
   REQUEST_ID_TYPE_INVALID = 'REQUEST_ID_TYPE_INVALID',
+  INVALID_MONTH_VALUE = 'INVALID_MONTH_VALUE',
 
   // 401 Unauthorized
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -108,6 +109,11 @@ export class ResponseStatusFactory {
     [ResponseCode.REQUEST_ID_TYPE_INVALID]: {
       status: HttpStatus.BAD_REQUEST,
       message: '유효하지 않은 ID 타입입니다.',
+    },
+
+    [ResponseCode.INVALID_MONTH_VALUE]: {
+      status: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 달 입니다.',
     },
 
     // 401 Unauthorized

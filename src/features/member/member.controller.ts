@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { MemberService } from './member.service';
 
@@ -16,8 +16,8 @@ export class MemberController {
     return this.memberService.findAll();
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.memberService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.memberService.remove(+id);
+  // }
 }

@@ -1,4 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import {
+  ResponseCode,
+  ResponseStatusFactory,
+} from 'src/common/api-response/response-status';
+import { CommonException } from 'src/common/exception/common-exception';
 import { PrismaService } from 'src/common/prisma-module/prisma.service';
 import { MemberResponseDto } from './dto';
 import { CreateMemberDto } from './dto/create-member.dto';
@@ -27,7 +32,16 @@ export class MemberService {
     return member ? MemberResponseDto.from(member) : null;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} member`;
+  async findById(id: bigint) {
+    const member = await this.prismaService.member.findUnique({
+      where: { id },
+    });
+
+    if (!member)
+      throw new CommonException(
+        ResponseStatusFactory.create(ResponseCode.MEMBER_NOT_FOUND),
+      );
+
+    return MemberResponseDto.from(member);
   }
 }

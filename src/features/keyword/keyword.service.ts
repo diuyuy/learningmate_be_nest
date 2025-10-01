@@ -1,26 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { CreateKeywordDto } from './dto/create-keyword.dto';
-import { UpdateKeywordDto } from './dto/update-keyword.dto';
+import {
+  ResponseCode,
+  ResponseStatusFactory,
+} from 'src/common/api-response/response-status';
+import { CommonException } from 'src/common/exception/common-exception';
+import { PrismaService } from 'src/common/prisma-module/prisma.service';
+import { KeywordResponseDto, TodaysKeywordResponseDto } from './dto';
 
 @Injectable()
 export class KeywordService {
-  create(createKeywordDto: CreateKeywordDto) {
-    return 'This action adds a new keyword';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async findByPeriod(startDate: Date, endDate: Date) {
+    const todaysKeywords = await this.prismaService.todaysKeyword.findMany({
+      select: {
+        id: true,
+        date: true,
+        keyword: true,
+      },
+      where: {
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    return todaysKeywords.map(TodaysKeywordResponseDto.from);
   }
 
-  findAll() {
-    return `This action returns all keyword`;
-  }
+  async findById(id: bigint) {
+    const keyword = await this.prismaService.keyword.findUnique({
+      where: {
+        id,
+      },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} keyword`;
-  }
+    if (!keyword)
+      throw new CommonException(
+        ResponseStatusFactory.create(ResponseCode.KEYWORD_NOT_FOUND),
+      );
 
-  update(id: number, updateKeywordDto: UpdateKeywordDto) {
-    return `This action updates a #${id} keyword`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} keyword`;
+    return KeywordResponseDto.from(keyword);
   }
 }

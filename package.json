@@ -18,10 +18,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db:pull": "dotenv -e .env.local prisma db pull",
-    "db:push": "dotenv -e .env.local prisma db push",
-    "db:gen": "dotenv -e .env.local prisma generate",
-    "db:mig": "dotenv -e .env.local prisma migrate dev"
+    "db:pull": "prisma db pull",
+    "db:push": "prisma db push",
+    "db:gen": "prisma generate --sql",
+    "db:mig": "prisma migrate dev"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
