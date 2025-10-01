@@ -1,42 +1,42 @@
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
+import { ApiResponse } from 'src/common/api-response/api-response';
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+  ResponseCode,
+  ResponseStatusFactory,
+} from 'src/common/api-response/response-status';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { CookieService } from './cookie.service';
+import { Public } from './decorators/public';
+import { GoogleOauthAuthGuard } from './guards/google-oauth-auth.guard';
+import type { RequestWithUser } from './types/request-with-user';
 
+@Public()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cookieService: CookieService,
+  ) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
+  @UseGuards(GoogleOauthAuthGuard)
+  @Get('login/oauth2/google')
+  googleOauthRequest() {}
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  @UseGuards(GoogleOauthAuthGuard)
+  @Get('callback/google')
+  googleOauthCallback(
+    @Req() req: RequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { accessToken } = this.authService.signIn(req.user);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
+    res.cookie(
+      'accessToken',
+      accessToken,
+      this.cookieService.getAccessTokenCookieOption(),
+    );
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 }

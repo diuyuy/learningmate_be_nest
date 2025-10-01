@@ -10,8 +10,8 @@ datasource db {
 
 model Article {
   id          BigInt    @id @default(autoincrement())
-  createdAt   DateTime? @db.Timestamp(6)
-  updatedAt   DateTime? @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   content     String    @db.Text
   link        String    @db.VarChar(255)
   press       String    @db.VarChar(30)
@@ -31,8 +31,8 @@ model Article {
 
 model Category {
   id        BigInt      @id @default(autoincrement())
-  createdAt DateTime?   @db.Timestamp(6)
-  updatedAt DateTime?   @db.Timestamp(6)
+  createdAt DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt DateTime    @default(now()) @updatedAt @db.Timestamp(6)
   name      String      @db.VarChar(2)
   keyword   Keyword[]
   statistic Statistic[]
@@ -40,8 +40,8 @@ model Category {
 
 model Keyword {
   id            BigInt          @id @default(autoincrement())
-  createdAt     DateTime?       @db.Timestamp(6)
-  updatedAt     DateTime?       @db.Timestamp(6)
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime        @default(now()) @updatedAt @db.Timestamp(6)
   description   String          @db.VarChar(1320)
   name          String          @db.VarChar(80)
   categoryId    BigInt
@@ -56,8 +56,8 @@ model Keyword {
 
 model Member {
   id           BigInt       @id @default(autoincrement())
-  createdAt    DateTime?    @db.Timestamp(6)
-  updatedAt    DateTime?    @db.Timestamp(6)
+  createdAt    DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime     @default(now()) @updatedAt @db.Timestamp(6)
   email        String       @unique(map: "UK9qv6yhjqm8iafto8qk452gx8h") @db.VarChar(255)
   imageUrl     String?      @db.VarChar(255)
   nickname     String?      @unique(map: "UKp0hytgwmegm8egg7lrjqpesp") @db.VarChar(50)
@@ -73,8 +73,8 @@ model Member {
 
 model Quiz {
   id          BigInt       @id @default(autoincrement())
-  createdAt   DateTime?    @db.Timestamp(6)
-  updatedAt   DateTime?    @db.Timestamp(6)
+  createdAt   DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime     @default(now()) @updatedAt @db.Timestamp(6)
   answer      String       @db.VarChar(1)
   description String       @db.VarChar(255)
   explanation String       @db.VarChar(512)
@@ -91,8 +91,8 @@ model Quiz {
 
 model Review {
   id         BigInt       @id @default(autoincrement())
-  createdAt  DateTime?    @db.Timestamp(6)
-  updatedAt  DateTime?    @db.Timestamp(6)
+  createdAt  DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamp(6)
   content1   String       @db.VarChar(2000)
   content2   String       @db.VarChar(2000)
   content3   String       @db.VarChar(2000)
@@ -108,8 +108,8 @@ model Review {
 
 model Statistic {
   id         BigInt    @id @default(autoincrement())
-  createdAt  DateTime? @db.Timestamp(6)
-  updatedAt  DateTime? @db.Timestamp(6)
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   studyCount BigInt    @default(0)
   categoryId BigInt
   memberId   BigInt
@@ -122,8 +122,8 @@ model Statistic {
 
 model Study {
   id         BigInt    @id @default(autoincrement())
-  createdAt  DateTime? @db.Timestamp(6)
-  updatedAt  DateTime? @db.Timestamp(6)
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   studyStats Int       @default(0) @db.TinyInt
   keywordId  BigInt
   memberId   BigInt
@@ -136,8 +136,8 @@ model Study {
 
 model TodaysKeyword {
   id        BigInt    @id @default(autoincrement())
-  createdAt DateTime? @db.Timestamp(6)
-  updatedAt DateTime? @db.Timestamp(6)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   date      DateTime  @unique(map: "UKlgeus1t64dtgvkdlpx6h22tdh") @db.Date
   keywordId BigInt
   keyword   Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKbag38p1orbpj7fpn33bf77raa")
@@ -147,8 +147,8 @@ model TodaysKeyword {
 
 model Video {
   id        BigInt    @id @default(autoincrement())
-  createdAt DateTime? @db.Timestamp(6)
-  updatedAt DateTime? @db.Timestamp(6)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   link      String    @db.VarChar(2048)
   keywordId BigInt
   keyword   Keyword   @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKm9n9p7beulerlb1jj05se00n2")
@@ -158,8 +158,8 @@ model Video {
 
 model LikeReview {
   id        BigInt    @id @default(autoincrement())
-  createdAt DateTime? @db.Timestamp(6)
-  updatedAt DateTime? @db.Timestamp(6)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   memberId  BigInt
   reviewId  BigInt
   review    Review    @relation(fields: [reviewId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK9rovxawis6ajfnvvpg901ghly")
@@ -172,8 +172,8 @@ model LikeReview {
 
 model MemberQuiz {
   id           BigInt    @id @default(autoincrement())
-  createdAt    DateTime? @db.Timestamp(6)
-  updatedAt    DateTime? @db.Timestamp(6)
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @default(now()) @updatedAt @db.Timestamp(6)
   memberAnswer String    @db.VarChar(1)
   memberId     BigInt
   quizId       BigInt

@@ -3,6 +3,6 @@ import { ResponseStatus } from '../api-response/response-status';
 
 export class CommonException extends HttpException {
   constructor(responseStatus: ResponseStatus) {
-    super(responseStatus, responseStatus.httpStatus);
+    super(responseStatus, responseStatus.status);
   }
 }

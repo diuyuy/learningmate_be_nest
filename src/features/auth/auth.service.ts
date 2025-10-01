@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from 'src/common/prisma-module/prisma.service';
+import { MemberInfo } from './types/member-info';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  signIn({ id }: MemberInfo) {
+    const payload = { sub: id };
+    const accessToken = this.jwtService.sign(payload);
+
+    return { accessToken };
   }
 
   findAll() {
@@ -14,10 +23,6 @@ export class AuthService {
 
   findOne(id: number) {
     return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
   }
 
   remove(id: number) {
