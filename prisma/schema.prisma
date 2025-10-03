@@ -132,6 +132,7 @@ model Study {
   member     Member   @relation(fields: [memberId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKe649b4utnj7k15p724xrnhuet")
   keyword    Keyword  @relation(fields: [keywordId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FKh9kqg6kindl5l651edqsuttf3")
 
+  @@unique([keywordId, memberId], map: "uk_keyword_member")
   @@index([memberId], map: "FKe649b4utnj7k15p724xrnhuet")
   @@index([keywordId], map: "FKh9kqg6kindl5l651edqsuttf3")
 }

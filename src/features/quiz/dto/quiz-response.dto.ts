@@ -1,5 +1,19 @@
 import { Quiz } from 'generated/prisma';
 
+type QuizWithArticle = {
+  article: {
+    keywordId: bigint;
+  };
+  id: bigint;
+  answer: string;
+  description: string;
+  explanation: string;
+  question1: string;
+  question2: string;
+  question3: string;
+  question4: string;
+};
+
 export class QuizResponseDto {
   id: bigint;
   description: string;
@@ -41,7 +55,7 @@ export class QuizResponseDto {
   }
 
   static fromGrading(
-    quiz: Quiz,
+    quiz: QuizWithArticle,
     isCorrect: boolean,
     memberAnswer: string,
   ): QuizResponseDto {

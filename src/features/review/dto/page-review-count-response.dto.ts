@@ -1,3 +1,5 @@
+import { ReviewFromPrisma } from '../types/types';
+
 export class PageReviewCountResponseDto {
   id: bigint;
   articleId: bigint;
@@ -29,5 +31,18 @@ export class PageReviewCountResponseDto {
     this.title = title;
     this.likeCount = likeCount;
     this.likedByMe = likedByMe;
+  }
+
+  static from(this: void, review: ReviewFromPrisma) {
+    const { member, article, _count, likeReview, ...rest } = review;
+    return new PageReviewCountResponseDto({
+      ...rest,
+      memberId: member.id,
+      nickname: member.nickname,
+      articleId: article.id,
+      title: article.title,
+      likeCount: BigInt(_count.likeReview),
+      likedByMe: !!likeReview.length,
+    });
   }
 }

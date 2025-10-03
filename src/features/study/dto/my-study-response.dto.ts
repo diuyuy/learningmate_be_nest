@@ -1,4 +1,5 @@
 import { Study } from 'generated/prisma';
+import { STUDY_FLAGS } from 'src/common/constants/study-flag';
 
 export class MyStudyResponseDto {
   id: bigint;
@@ -39,11 +40,6 @@ export class MyStudyResponseDto {
   ): MyStudyResponseDto {
     const value = studyStats ?? 0;
 
-    // Bit flags for study completion status
-    const VIDEO_BIT = 1; // 0001
-    const QUIZ_BIT = 2; // 0010
-    const REVIEW_BIT = 4; // 0100
-
     const bitCount = (value.toString(2).match(/1/g) || []).length;
 
     return new MyStudyResponseDto({
@@ -51,9 +47,9 @@ export class MyStudyResponseDto {
       keywordId,
       studyStats: value,
       studyStatusCount: bitCount,
-      videoCompleted: (value & VIDEO_BIT) !== 0,
-      quizCompleted: (value & QUIZ_BIT) !== 0,
-      reviewCompleted: (value & REVIEW_BIT) !== 0,
+      videoCompleted: (value & STUDY_FLAGS.VIDEO) !== 0,
+      quizCompleted: (value & STUDY_FLAGS.QUIZ) !== 0,
+      reviewCompleted: (value & STUDY_FLAGS.REVIEW) !== 0,
       createdAt,
       updatedAt,
     });

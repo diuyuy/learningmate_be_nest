@@ -2,6 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 
 export enum ResponseCode {
   OK = 'OK',
+  REVIEW_CREATED = 'REVIEW_CREATED',
 
   // 400 Bad Request
   BAD_REQUEST = 'BAD_REQUEST',
@@ -68,6 +69,11 @@ export class ResponseStatusFactory {
     [ResponseCode.OK]: {
       status: HttpStatus.OK,
       message: '요청이 성공적으로 처리되었습니다.',
+    },
+
+    [ResponseCode.REVIEW_CREATED]: {
+      status: HttpStatus.CREATED,
+      message: '리뷰가 성공적으로 작성되었습니다.',
     },
 
     // 400 Bad Request
@@ -237,14 +243,6 @@ export class ResponseStatusFactory {
 
   static create(code: ResponseCode, customMessage?: string): ResponseStatus {
     const config = this.statusMap[code];
-    return new ResponseStatus(config.status, customMessage || config.message);
-  }
-
-  static getHttpStatus(code: ResponseCode): number {
-    return this.statusMap[code].status;
-  }
-
-  static getMessage(code: ResponseCode): string {
-    return this.statusMap[code].message;
+    return new ResponseStatus(config.status, customMessage ?? config.message);
   }
 }

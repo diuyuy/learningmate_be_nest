@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PrivateResultType } from 'generated/prisma/runtime/library';
-import { getHotReviews } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/common/api-response/response-status';
 import { CommonException } from 'src/common/exception/common-exception';
-import { PrismaService } from 'src/common/prisma-module/prisma.service';
+import { Pageable, ReviewSortOption } from 'src/common/types/types';
 import {
   MyReviewResponseDto,
   PageReviewCountResponseDto,
   ReviewCreateRequestDto,
   ReviewUpdateRequestDto,
 } from './dto';
-import { GetHotReviewResult, MemberAndReviewId } from './types/types';
+import { ReviewRepository } from './review.repository';
+import { MemberAndReviewId } from './types/types';
 
 @Injectable()
 export class ReviewService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly reviewRepository: ReviewRepository) {}
 
   async create(
     memberId: bigint,
@@ -30,23 +29,11 @@ export class ReviewService {
       );
     }
 
-    //TODO: Study 에 review 작성했다고 표시 필요
-
-    const newReview = await this.prismaService.review.create({
-      data: {
-        memberId,
-        articleId,
-        ...reviewCreateRequestDto,
-      },
-      select: {
-        id: true,
-        article: true,
-        content1: true,
-        content2: true,
-        content3: true,
-        memberId: true,
-      },
-    });
+    const newReview = await this.reviewRepository.create(
+      memberId,
+      articleId,
+      reviewCreateRequestDto,
+    );
 
     return MyReviewResponseDto.from(newReview);
   }
@@ -58,34 +45,16 @@ export class ReviewService {
     memberId: bigint;
     articleId: bigint;
   }) {
-    const review = await this.prismaService.review.findUnique({
-      select: {
-        id: true,
-        article: true,
-        content1: true,
-        content2: true,
-        content3: true,
-        memberId: true,
-      },
-      where: {
-        review_member_article: {
-          articleId,
-          memberId,
-        },
-      },
-    });
+    const review = await this.reviewRepository.findByMemberAndArticle(
+      memberId,
+      articleId,
+    );
 
     return review ? MyReviewResponseDto.from(review) : null;
   }
 
   async getLikeReviewCount(reviewId: bigint) {
-    const count = await this.prismaService.likeReview.count({
-      where: {
-        reviewId,
-      },
-    });
-
-    return count;
+    return this.reviewRepository.getLikeCount(reviewId);
   }
 
   async update({
@@ -99,44 +68,66 @@ export class ReviewService {
   }) {
     await this.validateOwnership({ memberId, reviewId });
 
-    const updatedReview = await this.prismaService.review.update({
-      data: {
-        content1,
-        content2,
-        content3,
-      },
-      select: {
-        id: true,
-        article: true,
-        content1: true,
-        content2: true,
-        content3: true,
-        memberId: true,
-      },
-      where: {
-        id: reviewId,
-      },
+    const updatedReview = await this.reviewRepository.update(reviewId, {
+      content1,
+      content2,
+      content3,
     });
 
     return MyReviewResponseDto.from(updatedReview);
   }
 
-  //TODO: 클라이언트와 상의 필요
+  async findReviewsByArticle({
+    memberId,
+    articleId,
+    pageAble,
+  }: {
+    memberId: bigint;
+    articleId: bigint;
+    pageAble: Pageable<ReviewSortOption>;
+  }) {
+    return this.reviewRepository.findReviewsByArticleId(
+      memberId,
+      articleId,
+      pageAble,
+    );
+  }
+
+  async findReviewsByKeyword({
+    memberId,
+    keywordId,
+    pageAble,
+  }: {
+    memberId: bigint;
+    keywordId: bigint;
+    pageAble: Pageable<ReviewSortOption>;
+  }) {
+    return this.reviewRepository.findReviewsByKeywordId(
+      memberId,
+      keywordId,
+      pageAble,
+    );
+  }
+
   async getHotReviews(
     memberId: bigint,
-    start: Date,
-    end: Date,
-    page: number,
-    pageSize: number,
+    date: Date,
   ): Promise<PageReviewCountResponseDto[]> {
+    const start = new Date(date);
+    const end = new Date(date);
+    end.setDate(date.getDate() + 1);
+    const page = 0;
+    const pageSize = 5;
+
     const offset = page * pageSize;
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const queryResult = (await this.prismaService.$queryRawTyped(
-      getHotReviews(memberId, start, end, pageSize, offset),
-    )) as unknown as GetHotReviewResult[];
-
-    const reviews = queryResult.map((v) => v[PrivateResultType]);
+    const reviews = await this.reviewRepository.getHotReviews(
+      memberId,
+      start,
+      end,
+      pageSize,
+      offset,
+    );
 
     return reviews.map(({ likedByMe, ...fields }) => {
       return { likedByMe: !!likedByMe, ...fields };
@@ -146,11 +137,7 @@ export class ReviewService {
   async remove({ memberId, reviewId }: MemberAndReviewId) {
     await this.validateOwnership({ memberId, reviewId });
 
-    await this.prismaService.review.delete({
-      where: {
-        id: reviewId,
-      },
-    });
+    await this.reviewRepository.delete(reviewId);
   }
 
   async likeReview({
@@ -160,41 +147,15 @@ export class ReviewService {
     memberId: bigint;
     reviewId: bigint;
   }) {
-    await this.prismaService.likeReview.upsert({
-      where: {
-        id: reviewId,
-      },
-      update: {},
-      create: {
-        reviewId,
-        memberId,
-      },
-    });
+    await this.reviewRepository.likeReview(memberId, reviewId);
   }
 
   async unlikeReview({ memberId, reviewId }: MemberAndReviewId) {
-    await this.prismaService.likeReview.deleteMany({
-      where: {
-        memberId,
-        reviewId,
-      },
-    });
+    await this.reviewRepository.unlikeReview(memberId, reviewId);
   }
 
   private async hasWrittenReview(memberId: bigint, articleId: bigint) {
-    const review = await this.prismaService.review.findUnique({
-      select: {
-        id: true,
-      },
-      where: {
-        review_member_article: {
-          memberId,
-          articleId,
-        },
-      },
-    });
-
-    return !!review;
+    return this.reviewRepository.existsByMemberAndArticle(memberId, articleId);
   }
 
   private async validateOwnership({
@@ -204,14 +165,7 @@ export class ReviewService {
     memberId: bigint;
     reviewId: bigint;
   }) {
-    const review = await this.prismaService.review.findUnique({
-      select: {
-        memberId: true,
-      },
-      where: {
-        id: reviewId,
-      },
-    });
+    const review = await this.reviewRepository.findById(reviewId);
 
     if (!review)
       throw new CommonException(

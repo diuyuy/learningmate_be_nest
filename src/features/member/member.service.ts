@@ -20,10 +20,6 @@ export class MemberService {
     return newMember;
   }
 
-  findAll() {
-    return `This action returns all member`;
-  }
-
   async findByEmail(email: string) {
     const member = await this.prismaService.member.findUnique({
       where: { email },

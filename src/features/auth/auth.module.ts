@@ -23,7 +23,7 @@ import { JwtStrategy } from './strategy/jwt-strategy';
         configServie: ConfigService<z.infer<typeof envSchema>, true>,
       ) => ({
         secret: configServie.get('AUTH_SECRET'),
-        signOptions: { expiresIn: +configServie.get('AUTH_EXPIRATION_MILLS') },
+        signOptions: { expiresIn: '30d' }, //+configServie.get('AUTH_EXPIRATION_MILLS') },
       }),
       inject: [ConfigService],
     }),
