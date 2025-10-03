@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { BigIntInterceptor } from './common/interceptors/bigint.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalInterceptors(new BigIntInterceptor());
 
   await app.listen(process.env.PORT ?? 3000);
 }

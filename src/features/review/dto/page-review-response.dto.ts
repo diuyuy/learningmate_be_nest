@@ -2,7 +2,7 @@ export class PageReviewResponseDto {
   id: bigint;
   createdAt: Date;
   content1: string;
-  nickname: string;
+  nickname: string | null;
   title: string;
 
   constructor({

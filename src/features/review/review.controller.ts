@@ -16,6 +16,9 @@ import {
   ResponseStatusFactory,
 } from 'src/common/api-response/response-status';
 import { ParseBigIntPipe } from 'src/common/pipes/parse-bigint-pipe';
+import { ParseNonNegativeIntPipe } from 'src/common/pipes/parse-nonnegative-int-pipe';
+import { ParsePageSortPipe } from 'src/common/pipes/parse-page-sort-pipe';
+import type { PageSortOption, ReviewSortOption } from 'src/common/types/types';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import type { ReviewUpdateRequestDto } from './dto';
 import { ReviewService } from './review.service';
@@ -36,9 +39,38 @@ export class ReviewController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @Get('me')
+  async findMyReviews(
+    @Query('page', ParseNonNegativeIntPipe) page: number,
+    @Query('size', ParseNonNegativeIntPipe) size: number,
+    @Query(
+      'sort',
+      new ParsePageSortPipe<ReviewSortOption>([
+        'createdAt',
+        'updatedAt',
+        'likeCounts',
+      ]),
+    )
+    sortOption: PageSortOption<ReviewSortOption>,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+    const pageAble = { page, size, ...sortOption };
+
+    const pageReviews = await this.reviewService.findByMemberId(
+      memberId,
+      pageAble,
+    );
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      pageReviews,
+    );
+  }
+
   @Get('hot-reviews')
   async findHotReviews(
-    @Query('date', ParseDatePipe) date: Date,
+    @Query('date', new ParseDatePipe()) date: Date,
     @Req() req: RequestWithUser,
   ) {
     const memberId = BigInt(req.user.id);

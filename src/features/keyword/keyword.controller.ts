@@ -3,6 +3,7 @@ import {
   Get,
   Param,
   ParseDatePipe,
+  Post,
   Query,
   Req,
 } from '@nestjs/common';
@@ -32,8 +33,8 @@ export class KeywordController {
 
   @Get()
   async findTodaysKeywords(
-    @Query('startDate', ParseDatePipe) startDate: Date,
-    @Query('endDate', ParseDatePipe) endDate: Date,
+    @Query('startDate', new ParseDatePipe()) startDate: Date,
+    @Query('endDate', new ParseDatePipe()) endDate: Date,
   ) {
     const todaysKeywords = await this.keywordService.findByPeriod(
       startDate,
@@ -110,5 +111,17 @@ export class KeywordController {
       ResponseStatusFactory.create(ResponseCode.OK),
       video,
     );
+  }
+
+  @Post(':keywordId/videos')
+  async completeVideo(
+    @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    await this.videoService.upsertFlag(memberId, keywordId);
+
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 }

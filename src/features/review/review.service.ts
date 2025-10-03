@@ -38,6 +38,10 @@ export class ReviewService {
     return MyReviewResponseDto.from(newReview);
   }
 
+  async findByMemberId(memberId: bigint, pageAble: Pageable<ReviewSortOption>) {
+    return this.reviewRepository.findReviewsByMemberId(memberId, pageAble);
+  }
+
   async findByMemberAndArticle({
     memberId,
     articleId,

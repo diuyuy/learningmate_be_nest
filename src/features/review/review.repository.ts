@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrivateResultType } from 'generated/prisma/runtime/library';
-import { getHotReviews } from 'generated/prisma/sql';
+import { getHotReviews, upsertStudyFlag } from 'generated/prisma/sql';
 import { PageResponse } from 'src/common/api-response/page-response';
+import { STUDY_FLAGS } from 'src/common/constants/study-flag';
 import { PrismaService } from 'src/common/prisma-module/prisma.service';
 import { Pageable, ReviewSortOption } from '../../common/types/types';
-import { PageReviewCountResponseDto, ReviewCreateRequestDto } from './dto';
+import {
+  PageReviewCountResponseDto,
+  PageReviewResponseDto,
+  ReviewCreateRequestDto,
+} from './dto';
 import { GetHotReviewResult } from './types/types';
 
 @Injectable()
@@ -25,15 +30,27 @@ export class ReviewRepository {
     articleId: bigint,
     data: ReviewCreateRequestDto,
   ) {
-    //TODO: Study 에 review 작성했다고 표시 필요
+    return this.prismaService.$transaction(async (prisma) => {
+      const review = await prisma.review.create({
+        data: {
+          memberId,
+          articleId,
+          ...data,
+        },
+        select: this.reviewSelect,
+      });
 
-    return this.prismaService.review.create({
-      data: {
-        memberId,
-        articleId,
-        ...data,
-      },
-      select: this.reviewSelect,
+      await prisma.$queryRawTyped(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+        upsertStudyFlag(
+          memberId,
+          review.article.keywordId,
+          STUDY_FLAGS.REVIEW,
+          STUDY_FLAGS.REVIEW,
+        ),
+      );
+
+      return review;
     });
   }
 
@@ -106,6 +123,21 @@ export class ReviewRepository {
     pageAble: Pageable<ReviewSortOption>,
   ) {
     const reviews = await this.prismaService.review.findMany({
+      select: {
+        id: true,
+        createdAt: true,
+        content1: true,
+        member: {
+          select: {
+            nickname: true,
+          },
+        },
+        article: {
+          select: {
+            title: true,
+          },
+        },
+      },
       where: {
         memberId,
       },
@@ -114,7 +146,24 @@ export class ReviewRepository {
       orderBy: this.orderOption(pageAble),
     });
 
-    return reviews;
+    const totalElements = await this.prismaService.review.count({
+      where: {
+        memberId,
+      },
+    });
+
+    const pageReviews = reviews.map(
+      ({ id, createdAt, content1, article, member }) =>
+        new PageReviewResponseDto({
+          id,
+          createdAt,
+          content1,
+          title: article.title,
+          nickname: member.nickname,
+        }),
+    );
+
+    return PageResponse.from(pageReviews, totalElements, pageAble);
   }
 
   async findReviewsByKeywordId(

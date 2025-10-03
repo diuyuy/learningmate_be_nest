@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { upsertStudyFlag } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/common/api-response/response-status';
+import { STUDY_FLAGS } from 'src/common/constants/study-flag';
 import { CommonException } from 'src/common/exception/common-exception';
 import { PrismaService } from 'src/common/prisma-module/prisma.service';
 import { VideoResponseDto } from './dto/video-response.dto';
@@ -27,5 +29,17 @@ export class VideoService {
     }
 
     return VideoResponseDto.from(video);
+  }
+
+  async upsertFlag(memberId: bigint, keywordId: bigint) {
+    await this.prismaService.$queryRawTyped(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+      upsertStudyFlag(
+        memberId,
+        keywordId,
+        STUDY_FLAGS.VIDEO,
+        STUDY_FLAGS.VIDEO,
+      ),
+    );
   }
 }

@@ -7,16 +7,12 @@ import {
 import { CommonException } from 'src/common/exception/common-exception';
 import { PrismaService } from 'src/common/prisma-module/prisma.service';
 import { STUDY_FLAGS } from '../../common/constants/study-flag';
-import { StudyRepository } from '../study/study.repository';
 import { MemberQuizRequestDto } from './dto/member-quiz-request.dto';
 import { QuizResponseDto } from './dto/quiz-response.dto';
 
 @Injectable()
 export class QuizService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly studyRepository: StudyRepository,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findManyByArticleId(articleId: bigint) {
     const quizzes = await this.prismaService.quiz.findMany({

@@ -9,6 +9,7 @@ import { ParseNonNegativeIntPipe } from 'src/common/pipes/parse-nonnegative-int-
 import { ParsePageSortPipe } from 'src/common/pipes/parse-page-sort-pipe';
 import type { PageSortOption, ReviewSortOption } from 'src/common/types/types';
 import type { RequestWithUser } from '../auth/types/request-with-user';
+import { MemberQuizRequestDto } from '../quiz/dto/member-quiz-request.dto';
 import { QuizService } from '../quiz/quiz.service';
 import type { ReviewCreateRequestDto } from '../review/dto';
 import { ReviewService } from '../review/review.service';
@@ -109,5 +110,24 @@ export class ArticleController {
       ResponseStatusFactory.create(ResponseCode.REVIEW_CREATED),
       review,
     );
+  }
+
+  @Post(':articleId/quizzes/:quizId')
+  async solveQuiz(
+    @Param('articleId', ParseBigIntPipe) articleId: bigint,
+    @Param('quizId', ParseBigIntPipe) quizId: bigint,
+    @Req() req: RequestWithUser,
+    @Body() memberQuizRequest: MemberQuizRequestDto,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    await this.quizService.solveQuiz({
+      memberId,
+      articleId,
+      quizId,
+      memberQuizRequest,
+    });
+
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 }
