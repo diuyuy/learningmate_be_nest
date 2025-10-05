@@ -21,11 +21,14 @@ export class MemberService {
   }
 
   async findByEmail(email: string) {
-    const member = await this.prismaService.member.findUnique({
+    return this.prismaService.member.findUnique({
+      select: {
+        id: true,
+        email: true,
+        passwordHash: true,
+      },
       where: { email },
     });
-
-    return member ? MemberResponseDto.from(member) : null;
   }
 
   async findById(id: bigint) {
@@ -39,5 +42,16 @@ export class MemberService {
       );
 
     return MemberResponseDto.from(member);
+  }
+
+  async updatePassword(email: string, passwordHash: string) {
+    await this.prismaService.member.update({
+      data: {
+        passwordHash,
+      },
+      where: {
+        email,
+      },
+    });
   }
 }

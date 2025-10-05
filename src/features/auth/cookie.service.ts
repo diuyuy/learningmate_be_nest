@@ -17,8 +17,32 @@ export class CookieService {
     return {
       httpOnly: true,
       secure: true,
-      maxAge: +this.configService.get('AUTH_EXPIRATION_MILLS'),
-      sameSite: this.configService.get('AUTH_COOKIE_SAME_SITE'),
+      maxAge: this.configService.get<number>('AUTH_EXPIRATION_MILLS'),
+      sameSite: this.configService.get<'none' | 'lax'>('AUTH_COOKIE_SAME_SITE'),
+    };
+  }
+
+  getRefreshTokenCookieOption(): CookieOptions {
+    const expireDate = new Date();
+    expireDate.setDate(
+      expireDate.getDate() +
+        this.configService.get<number>('AUTH_REFRESH_TOKEN_EXPIRATION_DAYS'),
+    );
+
+    return {
+      httpOnly: true,
+      secure: true,
+      expires: expireDate,
+      sameSite: this.configService.get<'none' | 'lax'>('AUTH_COOKIE_SAME_SITE'),
+    };
+  }
+
+  getSignOutOptions(): CookieOptions {
+    return {
+      httpOnly: true,
+      secure: true,
+      maxAge: 0,
+      sameSite: this.configService.get<'none' | 'lax'>('AUTH_COOKIE_SAME_SITE'),
     };
   }
 }

@@ -2,6 +2,8 @@ import { HttpStatus } from '@nestjs/common';
 
 export enum ResponseCode {
   OK = 'OK',
+  CREATED = 'CREATED',
+  MEMBER_CREATED = 'MEMBER_CREATED',
   REVIEW_CREATED = 'REVIEW_CREATED',
 
   // 400 Bad Request
@@ -15,6 +17,7 @@ export enum ResponseCode {
   INVALID_MEMBER_ID = 'INVALID_MEMBER_ID',
   REQUEST_ID_TYPE_INVALID = 'REQUEST_ID_TYPE_INVALID',
   INVALID_MONTH_VALUE = 'INVALID_MONTH_VALUE',
+  INVALID_EMAIL = 'INVALID_EMAIL',
 
   // 401 Unauthorized
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -71,6 +74,16 @@ export class ResponseStatusFactory {
       message: '요청이 성공적으로 처리되었습니다.',
     },
 
+    [ResponseCode.CREATED]: {
+      status: HttpStatus.CREATED,
+      message: '요청이 성공적으로 처리되었습니다.',
+    },
+
+    [ResponseCode.MEMBER_CREATED]: {
+      status: HttpStatus.CREATED,
+      message: '회원가입이 성공적으로 완료되었습니다.',
+    },
+
     [ResponseCode.REVIEW_CREATED]: {
       status: HttpStatus.CREATED,
       message: '리뷰가 성공적으로 작성되었습니다.',
@@ -120,6 +133,11 @@ export class ResponseStatusFactory {
     [ResponseCode.INVALID_MONTH_VALUE]: {
       status: HttpStatus.BAD_REQUEST,
       message: '유효하지 않은 달 입니다.',
+    },
+
+    [ResponseCode.INVALID_EMAIL]: {
+      status: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 이메일 형식입니다.',
     },
 
     // 401 Unauthorized
