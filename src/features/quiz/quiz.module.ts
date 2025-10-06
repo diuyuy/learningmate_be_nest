@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'src/common/prisma-module/prisma.module';
+import { PrismaModule } from 'src/core/infrastructure/prisma-module/prisma.module';
 import { StudyModule } from '../study/study.module';
 import { QuizController } from './quiz.controller';
 import { QuizService } from './quiz.service';

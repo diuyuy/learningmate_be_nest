@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { CommonException } from 'src/core/exception/common-exception';
+import { ArticleRepository } from './article.repository';
 import { ArticlePreviewResponseDto } from './dto/article-preview-response.dto';
 import { ArticleResponseDto } from './dto/article-response.dto';
-import { ArticleRepository } from './article.repository';
 
 @Injectable()
 export class ArticleService {

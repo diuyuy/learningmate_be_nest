@@ -10,9 +10,9 @@ import { ConfigService } from '@nestjs/config';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { EnvSchema } from 'src/common/config/validate-env';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { EnvSchema } from 'src/core/config/validate-env';
+import { CommonException } from 'src/core/exception/common-exception';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

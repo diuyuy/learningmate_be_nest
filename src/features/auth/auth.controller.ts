@@ -11,16 +11,16 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import { ApiResponse } from 'src/common/api-response/api-response';
+import { ApiResponse } from 'src/core/api-response/api-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { EnvSchema } from 'src/common/config/validate-env';
-import { CommonException } from 'src/common/exception/common-exception';
-import { ParseEmailPipe } from 'src/common/pipes/parse-email-pipe';
+} from 'src/core/api-response/response-status';
+import { EnvSchema } from 'src/core/config/validate-env';
+import { CommonException } from 'src/core/exception/common-exception';
+import { CookieService } from 'src/core/infrastructure/cookie/cookie.service';
+import { ParseEmailPipe } from 'src/core/pipes/parse-email-pipe';
 import { AuthService } from './auth.service';
-import { CookieService } from './cookie.service';
 import { Public } from './decorators/public';
 import {
   AuthCodeGetRequestDto,

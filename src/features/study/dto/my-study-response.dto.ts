@@ -1,5 +1,5 @@
 import { Study } from 'generated/prisma';
-import { STUDY_FLAGS } from 'src/common/constants/study-flag';
+import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 
 export class MyStudyResponseDto {
   id: bigint;

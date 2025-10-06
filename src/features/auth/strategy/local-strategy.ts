@@ -4,11 +4,11 @@ import { Strategy } from 'passport-local';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { PASSPORT_STRATEGY_NAME } from 'src/common/constants/passport-strategy-name';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { PASSPORT_STRATEGY_NAME } from 'src/core/constants/passport-strategy-name';
+import { CommonException } from 'src/core/exception/common-exception';
 import { AuthService } from '../auth.service';
-import { MemberInfo } from '../types/member-info';
+import { MemberInfo, MemberRole } from '../types/member-info';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(
@@ -29,6 +29,6 @@ export class LocalStrategy extends PassportStrategy(
         ResponseStatusFactory.create(ResponseCode.INVALID_AUTH_FORMAT),
       );
 
-    return { id: String(member.id) };
+    return { id: String(member.id), role: String(member.role) as MemberRole };
   }
 }

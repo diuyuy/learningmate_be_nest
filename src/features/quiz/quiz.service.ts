@@ -3,10 +3,10 @@ import { upsertStudyFlag } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { CommonException } from 'src/common/exception/common-exception';
-import { PrismaService } from 'src/common/prisma-module/prisma.service';
-import { STUDY_FLAGS } from '../../common/constants/study-flag';
+} from 'src/core/api-response/response-status';
+import { CommonException } from 'src/core/exception/common-exception';
+import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
+import { STUDY_FLAGS } from '../../core/constants/study-flag';
 import { MemberQuizRequestDto } from './dto/member-quiz-request.dto';
 import { QuizResponseDto } from './dto/quiz-response.dto';
 

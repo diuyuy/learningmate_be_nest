@@ -92,6 +92,18 @@ export class IoRedisService implements OnModuleDestroy {
     }
   }
 
+  async expireInDays(key: string, days: number): Promise<boolean> {
+    try {
+      const seconds = days * 24 * 60 * 60;
+      const result = await this.redisClient.expire(key, seconds);
+      this.logger.debug(`EXPIRE ${key} ${days} day(s): ${result === 1}`);
+      return result === 1;
+    } catch (error) {
+      this.logger.error(`Failed to EXPIRE ${key}`, error.stack);
+      throw error;
+    }
+  }
+
   async getTtlSeconds(key: string): Promise<number> {
     try {
       const result = await this.redisClient.ttl(key);
@@ -110,6 +122,17 @@ export class IoRedisService implements OnModuleDestroy {
       return result;
     } catch (error) {
       this.logger.error(`Failed to INCR ${key}`, error.stack);
+      throw error;
+    }
+  }
+
+  async incrby(key: string, increment: number): Promise<number> {
+    try {
+      const result = await this.redisClient.incrby(key, increment);
+      this.logger.debug(`INCRBY ${key} ${increment}: ${result}`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to INCRBY ${key}`, error.stack);
       throw error;
     }
   }

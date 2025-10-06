@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'src/common/prisma-module/prisma.module';
+import { PrismaModule } from 'src/core/infrastructure/prisma-module/prisma.module';
+import { S3Module } from 'src/core/infrastructure/s3/s3.module';
 import { ReviewModule } from '../review/review.module';
 import { StudyModule } from '../study/study.module';
 import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
-import { S3Service } from './s3.service';
 
 @Module({
-  imports: [PrismaModule, StudyModule, ReviewModule],
+  imports: [PrismaModule, StudyModule, ReviewModule, S3Module],
   controllers: [MemberController],
-  providers: [MemberService, S3Service],
+  providers: [MemberService],
   exports: [MemberService],
 })
 export class MemberModule {}

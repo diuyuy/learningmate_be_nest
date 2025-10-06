@@ -1,4 +1,4 @@
-import { HTML_PATH } from 'src/common/constants/email-constants';
+import { HTML_PATH } from 'src/core/constants/email-constants';
 
 export type HtmlType =
   | {

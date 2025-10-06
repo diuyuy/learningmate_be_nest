@@ -5,13 +5,13 @@ import { Profile, Strategy } from 'passport-google-oauth20';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { envSchema } from 'src/common/config/validate-env';
-import { PASSPORT_STRATEGY_NAME } from 'src/common/constants/passport-strategy-name';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { envSchema } from 'src/core/config/validate-env';
+import { PASSPORT_STRATEGY_NAME } from 'src/core/constants/passport-strategy-name';
+import { CommonException } from 'src/core/exception/common-exception';
 import { MemberService } from 'src/features/member/member.service';
 import z from 'zod';
-import { MemberInfo } from '../types/member-info';
+import { MemberInfo, MemberRole } from '../types/member-info';
 
 @Injectable()
 export class GoogleOauthStrategy extends PassportStrategy(
@@ -48,10 +48,13 @@ export class GoogleOauthStrategy extends PassportStrategy(
     const member = await this.memberService.findByEmail(email);
 
     if (!member) {
-      const { id } = await this.memberService.create({ email });
-      return { id: String(id) };
+      const { id, role } = await this.memberService.create({ email });
+      return { id: String(id), role: String(role) as MemberRole };
     }
 
-    return { id: String(member.id) };
+    return {
+      id: String(member.id),
+      role: String(member.role) as MemberRole,
+    };
   }
 }

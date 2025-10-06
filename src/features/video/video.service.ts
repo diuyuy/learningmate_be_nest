@@ -3,10 +3,10 @@ import { upsertStudyFlag } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { STUDY_FLAGS } from 'src/common/constants/study-flag';
-import { CommonException } from 'src/common/exception/common-exception';
-import { PrismaService } from 'src/common/prisma-module/prisma.service';
+} from 'src/core/api-response/response-status';
+import { STUDY_FLAGS } from 'src/core/constants/study-flag';
+import { CommonException } from 'src/core/exception/common-exception';
+import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { VideoResponseDto } from './dto/video-response.dto';
 
 @Injectable()

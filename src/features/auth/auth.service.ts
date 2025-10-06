@@ -6,10 +6,11 @@ import { randomInt } from 'crypto';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { EnvSchema } from 'src/common/config/validate-env';
-import { CommonException } from 'src/common/exception/common-exception';
-import { IoRedisService } from 'src/common/io-redis/io-redis.service';
+} from 'src/core/api-response/response-status';
+import { EnvSchema } from 'src/core/config/validate-env';
+import { CommonException } from 'src/core/exception/common-exception';
+import { EmailService } from 'src/core/infrastructure/email/email.service';
+import { IoRedisService } from 'src/core/infrastructure/io-redis/io-redis.service';
 import { v4 as uuidv4 } from 'uuid';
 import { MemberService } from '../member/member.service';
 import {
@@ -19,7 +20,6 @@ import {
   SendResetPasswdRequestDto,
 } from './dto';
 import { SignUpRequestDto } from './dto/signup-request.dto';
-import { EmailService } from './email.service';
 import { MemberInfo } from './types/member-info';
 
 @Injectable()
@@ -34,9 +34,9 @@ export class AuthService {
 
   private readonly SALT_OR_AROUNDS = 10;
 
-  async signIn({ id }: MemberInfo) {
-    const accessToken = this.generateAccessToken(id);
-    const refreshToken = await this.generateRefreshToken(id);
+  async signIn(memberInfo: MemberInfo) {
+    const accessToken = this.generateAccessToken(memberInfo);
+    const refreshToken = await this.generateRefreshToken(memberInfo);
 
     return { accessToken, refreshToken };
   }
@@ -44,8 +44,14 @@ export class AuthService {
   async signInByEmailPasswd(memberId: string): Promise<LoginResultDto> {
     const memberResponse = await this.memberService.findById(BigInt(memberId));
 
-    const accessToken = this.generateAccessToken(memberId);
-    const refreshToken = await this.generateRefreshToken(memberId);
+    const accessToken = this.generateAccessToken({
+      id: memberId,
+      role: memberResponse.role,
+    });
+    const refreshToken = await this.generateRefreshToken({
+      id: memberId,
+      role: memberResponse.role,
+    });
 
     return { accessToken, refreshToken, memberResponse };
   }
@@ -67,19 +73,21 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string) {
-    const memberId = await this.redisService.get(
+    const memberInfoJson = await this.redisService.get(
       this.generateRefreshTokenKey(refreshToken),
     );
 
-    if (!memberId) {
+    if (!memberInfoJson) {
       throw new CommonException(
         ResponseStatusFactory.create(ResponseCode.INVALID_REFRESH_TOKEN),
       );
     }
 
-    const accessToken = this.generateAccessToken(memberId);
+    const memberInfo = JSON.parse(memberInfoJson) as MemberInfo;
 
-    const newRefreshToken = await this.generateRefreshToken(memberId);
+    const accessToken = this.generateAccessToken(memberInfo);
+
+    const newRefreshToken = await this.generateRefreshToken(memberInfo);
 
     return { accessToken, refreshToken: newRefreshToken };
   }
@@ -168,13 +176,13 @@ export class AuthService {
     }
   }
 
-  private generateAccessToken(id: string) {
-    const payload = { sub: id };
+  private generateAccessToken({ id, role }: MemberInfo) {
+    const payload = { sub: id, role };
 
     return this.jwtService.sign(payload);
   }
 
-  private async generateRefreshToken(memberId: string) {
+  private async generateRefreshToken(memberInfo: MemberInfo) {
     const refreshToken = uuidv4();
     const expiresDay = this.configService.get<number>(
       'AUTH_REFRESH_TOKEN_EXPIRATION_DAYS',
@@ -182,7 +190,7 @@ export class AuthService {
 
     await this.redisService.set(
       this.generateRefreshTokenKey(refreshToken),
-      memberId,
+      JSON.stringify(memberInfo),
       expiresDay * 24 * 3600,
     );
 

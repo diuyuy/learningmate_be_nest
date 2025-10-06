@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrivateResultType } from 'generated/prisma/runtime/library';
 import { getHotReviews, upsertStudyFlag } from 'generated/prisma/sql';
-import { PageResponse } from 'src/common/api-response/page-response';
-import { STUDY_FLAGS } from 'src/common/constants/study-flag';
-import { PrismaService } from 'src/common/prisma-module/prisma.service';
-import { Pageable, ReviewSortOption } from '../../common/types/types';
+import { PageResponse } from 'src/core/api-response/page-response';
+import { STUDY_FLAGS } from 'src/core/constants/study-flag';
+import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
+import { Pageable, ReviewSortOption } from '../../core/types/types';
 import {
   PageReviewCountResponseDto,
   PageReviewResponseDto,

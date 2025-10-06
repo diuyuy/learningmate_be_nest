@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { CommonException } from 'src/common/exception/common-exception';
-import { Pageable, ReviewSortOption } from 'src/common/types/types';
+} from 'src/core/api-response/response-status';
+import { CommonException } from 'src/core/exception/common-exception';
+import { Pageable, ReviewSortOption } from 'src/core/types/types';
 import {
   MyReviewResponseDto,
   PageReviewCountResponseDto,

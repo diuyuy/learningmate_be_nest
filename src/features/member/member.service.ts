@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { CommonException } from 'src/common/exception/common-exception';
-import { PrismaService } from 'src/common/prisma-module/prisma.service';
+} from 'src/core/api-response/response-status';
+import { CommonException } from 'src/core/exception/common-exception';
+import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
+import { S3Service } from 'src/core/infrastructure/s3/s3.service';
 import { MemberResponseDto, MemberUpdateRequestDto } from './dto';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { S3Service } from './s3.service';
 
 @Injectable()
 export class MemberService {
@@ -30,6 +30,7 @@ export class MemberService {
         id: true,
         email: true,
         passwordHash: true,
+        role: true,
       },
       where: { email },
     });

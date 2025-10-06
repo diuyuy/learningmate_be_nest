@@ -5,10 +5,10 @@ import { createTransport } from 'nodemailer';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { EnvSchema } from 'src/common/config/validate-env';
-import { EMAIL_SUBJECT, HTML_PATH } from 'src/common/constants/email-constants';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { EnvSchema } from 'src/core/config/validate-env';
+import { EMAIL_SUBJECT, HTML_PATH } from 'src/core/constants/email-constants';
+import { CommonException } from 'src/core/exception/common-exception';
 import { HtmlType } from './types/html-type';
 
 @Injectable()

@@ -2,14 +2,14 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { EnvSchema } from 'src/common/config/validate-env';
-import { IoRedisModule } from 'src/common/io-redis/io-redis.module';
-import { PrismaModule } from 'src/common/prisma-module/prisma.module';
+import { EnvSchema } from 'src/core/config/validate-env';
+import { CookieModule } from 'src/core/infrastructure/cookie/cookie.module';
+import { EmailModule } from 'src/core/infrastructure/email/email.module';
+import { IoRedisModule } from 'src/core/infrastructure/io-redis/io-redis.module';
+import { PrismaModule } from 'src/core/infrastructure/prisma-module/prisma.module';
 import { MemberModule } from '../member/member.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { CookieService } from './cookie.service';
-import { EmailService } from './email.service';
 import { GoogleOauthAuthGuard } from './guards/google-oauth-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -21,6 +21,8 @@ import { LocalStrategy } from './strategy/local-strategy';
   imports: [
     PrismaModule,
     MemberModule,
+    CookieModule,
+    EmailModule,
     JwtModule.registerAsync({
       useFactory: (configServie: ConfigService<EnvSchema, true>) => ({
         secret: configServie.get('AUTH_SECRET'),
@@ -50,8 +52,6 @@ import { LocalStrategy } from './strategy/local-strategy';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
-    CookieService,
-    EmailService,
   ],
 })
 export class AuthModule {}

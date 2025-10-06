@@ -15,11 +15,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiResponse } from 'src/common/api-response/api-response';
+import { ApiResponse } from 'src/core/api-response/api-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
+} from 'src/core/api-response/response-status';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import { ReviewService } from '../review/review.service';
 import { StudyService } from '../study/study.service';

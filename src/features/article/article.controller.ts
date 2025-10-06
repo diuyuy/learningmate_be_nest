@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
-import { ApiResponse } from 'src/common/api-response/api-response';
+import { ApiResponse } from 'src/core/api-response/api-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { ParseBigIntPipe } from 'src/common/pipes/parse-bigint-pipe';
-import { ParseNonNegativeIntPipe } from 'src/common/pipes/parse-nonnegative-int-pipe';
-import { ParsePageSortPipe } from 'src/common/pipes/parse-page-sort-pipe';
-import type { PageSortOption, ReviewSortOption } from 'src/common/types/types';
+} from 'src/core/api-response/response-status';
+import { ParseBigIntPipe } from 'src/core/pipes/parse-bigint-pipe';
+import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pipe';
+import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
+import type { PageSortOption, ReviewSortOption } from 'src/core/types/types';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import { MemberQuizRequestDto } from '../quiz/dto/member-quiz-request.dto';
 import { QuizService } from '../quiz/quiz.service';

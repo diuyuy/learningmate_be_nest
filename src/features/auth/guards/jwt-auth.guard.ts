@@ -5,9 +5,9 @@ import { Observable } from 'rxjs';
 import {
   ResponseCode,
   ResponseStatusFactory,
-} from 'src/common/api-response/response-status';
-import { PASSPORT_STRATEGY_NAME } from 'src/common/constants/passport-strategy-name';
-import { CommonException } from 'src/common/exception/common-exception';
+} from 'src/core/api-response/response-status';
+import { PASSPORT_STRATEGY_NAME } from 'src/core/constants/passport-strategy-name';
+import { CommonException } from 'src/core/exception/common-exception';
 import { IS_PUBLIC_KEY } from '../decorators/public';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CookieOptions } from 'express';
-import { envSchema } from 'src/common/config/validate-env';
+import { envSchema } from 'src/core/config/validate-env';
 import z from 'zod';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { validateEnv } from './common/config/validate-env';
+import { validateEnv } from './core/config/validate-env';
 import { ArticleModule } from './features/article/article.module';
 import { AuthModule } from './features/auth/auth.module';
 import { KeywordModule } from './features/keyword/keyword.module';
