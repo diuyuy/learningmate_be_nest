@@ -21,6 +21,11 @@ export const envSchema = z.object({
   [ENV_KEYS.REDIS_HOST]: z.string().nonempty(),
   [ENV_KEYS.REDIS_PORT]: z.string().nonempty(),
   [ENV_KEYS.EMAIL_RESET_PASSWD_REDIRECT_URL]: z.string().nonempty(),
+  [ENV_KEYS.AWS_REGION]: z.string().nonempty(),
+  [ENV_KEYS.AWS_ACCESS_KEY_ID]: z.string().nonempty(),
+  [ENV_KEYS.AWS_SECRET_ACCESS_KEY]: z.string().nonempty(),
+  [ENV_KEYS.AWS_S3_BUCKET]: z.string().nonempty(),
+  [ENV_KEYS.CLOUDFRONT_DOMAIN]: z.string().nonempty(),
 });
 
 export const validateEnv = (config: Record<string, unknown>) => {

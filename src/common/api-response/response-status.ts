@@ -18,6 +18,7 @@ export enum ResponseCode {
   REQUEST_ID_TYPE_INVALID = 'REQUEST_ID_TYPE_INVALID',
   INVALID_MONTH_VALUE = 'INVALID_MONTH_VALUE',
   INVALID_EMAIL = 'INVALID_EMAIL',
+  INVALID_IMAGE = 'INAVLID_IMAGE',
 
   // 401 Unauthorized
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -55,6 +56,7 @@ export enum ResponseCode {
   SEND_EMAIL_FAIL = 'SEND_EMAIL_FAIL',
   LOAD_IMAGE_FAIL = 'LOAD_IMAGE_FAIL',
   SAVE_IMAGE_FAIL = 'SAVE_IMAGE_FAIL',
+  DELETE_IMAGE_FAIL = 'DELETE_IMAGE_FAIL',
 }
 
 export class ResponseStatus {
@@ -138,6 +140,11 @@ export class ResponseStatusFactory {
     [ResponseCode.INVALID_EMAIL]: {
       status: HttpStatus.BAD_REQUEST,
       message: '유효하지 않은 이메일 형식입니다.',
+    },
+
+    [ResponseCode.INVALID_IMAGE]: {
+      status: HttpStatus.BAD_REQUEST,
+      message: '유효하지 않은 이미지 형식입니다.',
     },
 
     // 401 Unauthorized
@@ -256,6 +263,10 @@ export class ResponseStatusFactory {
     [ResponseCode.SAVE_IMAGE_FAIL]: {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       message: '이미지 저장을 실패했습니다.',
+    },
+    [ResponseCode.DELETE_IMAGE_FAIL]: {
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '이미지 삭제를 실패했습니다.',
     },
   } as const;
 
