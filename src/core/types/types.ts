@@ -11,3 +11,7 @@ export type Pageable<T> = {
 };
 
 export type ReviewSortOption = 'createdAt' | 'updatedAt' | 'likeCounts';
+export type ArticleScrapSortOption =
+  | 'createdAt'
+  | 'scrapCounts'
+  | 'viewsCounts';
