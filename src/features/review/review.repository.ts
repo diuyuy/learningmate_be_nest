@@ -41,7 +41,6 @@ export class ReviewRepository {
       });
 
       await prisma.$queryRawTyped(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
         upsertStudyFlag(
           memberId,
           review.article.keywordId,
@@ -245,9 +244,13 @@ export class ReviewRepository {
   }
 
   async likeReview(memberId: bigint, reviewId: bigint) {
+    console.log('>>>>>');
     await this.prismaService.likeReview.upsert({
       where: {
-        id: reviewId,
+        reviewId_memberId: {
+          memberId,
+          reviewId,
+        },
       },
       update: {},
       create: {
