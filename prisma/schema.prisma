@@ -19,10 +19,7 @@ model Article {
   createdAt   DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
   content     String   @db.Text
-  link        String   @db.VarChar(255)
-  press       String   @db.VarChar(30)
   publishedAt DateTime @db.Timestamp(6)
-  reporter    String   @db.VarChar(10)
   scrapCount  BigInt   @default(0)
   summary     String   @db.Text
   title       String   @db.VarChar(255)
