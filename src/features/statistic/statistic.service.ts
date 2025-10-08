@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { getWatchedVideoCounts } from 'generated/prisma/sql';
+import {
+  getStudyCategoryStatistics,
+  getWatchedVideoCounts,
+} from 'generated/prisma/sql';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { StudyAchivementResponseDto } from './dto/study-achivement-response.dto';
+import { StudyCatStatsResponseDto } from './dto/study-cat-stats-response.dto';
 
 @Injectable()
 export class StatisticService {
@@ -26,7 +30,7 @@ export class StatisticService {
             memberId,
           },
         }),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+
         this.prismaService.$queryRawTyped(getWatchedVideoCounts(memberId)),
       ]);
 
@@ -36,5 +40,13 @@ export class StatisticService {
       solvedQuizCounts,
       watchedVideoCounts: Number(videoCountsResult[0].watchedVideoCounts),
     });
+  }
+
+  async getStudyCategoryStats(memberId: bigint) {
+    const queryResult = await this.prismaService.$queryRawTyped(
+      getStudyCategoryStatistics(memberId),
+    );
+
+    return StudyCatStatsResponseDto.from(queryResult);
   }
 }

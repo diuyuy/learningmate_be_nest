@@ -85,6 +85,19 @@ export class MemberController {
     );
   }
 
+  @Get('me/study-category-statistics')
+  async getStudyCatStats(@Req() req: RequestWithUser) {
+    const memberId = BigInt(req.user.id);
+
+    const studyCatStats =
+      await this.statisticService.getStudyCategoryStats(memberId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      studyCatStats,
+    );
+  }
+
   @Patch('me')
   async updateMember(
     @Req() req: RequestWithUser,
