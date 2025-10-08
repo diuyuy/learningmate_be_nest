@@ -164,6 +164,19 @@ export class MemberController {
     );
   }
 
+  @Get('me/main-study-achievements')
+  async getMainStudyAchievements(@Req() req: RequestWithUser) {
+    const memberId = BigInt(req.user.id);
+
+    const studyAchievements =
+      await this.statisticService.getMainStudyAchievements(memberId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      studyAchievements,
+    );
+  }
+
   @Patch('me/profile-images')
   @UseInterceptors(FileInterceptor('image'))
   async updateProfileImage(

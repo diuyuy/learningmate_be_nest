@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import {
+  getMostStudiedCategory,
   getStudyCategoryStatistics,
   getWatchedVideoCounts,
 } from 'generated/prisma/sql';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
+import { MainStudyAchievementsResponseDto } from './dto/main-study-achievement-response.dto';
 import { QuizStatsResponseDto } from './dto/quiz-stats-response.dto';
 import { StudyAchivementResponseDto } from './dto/study-achivement-response.dto';
 import { StudyCatStatsResponseDto } from './dto/study-cat-stats-response.dto';
@@ -71,5 +73,57 @@ export class StatisticService {
         .length,
       totalCounts: answers.length,
     };
+  }
+
+  async getMainStudyAchievements(
+    memberId: bigint,
+  ): Promise<MainStudyAchievementsResponseDto> {
+    const [
+      monthlyAttendanceDays,
+      totalStudiedKeywords,
+      mostStudied,
+      totalReviews,
+    ] = await Promise.all([
+      this.prismaService.study.count({
+        where: {
+          memberId,
+          createdAt: {
+            gte: this.getMonthStartDate(),
+            lt: this.getMonthStartDate(true),
+          },
+        },
+      }),
+      this.prismaService.study.count({
+        where: {
+          memberId,
+          studyStats: STUDY_FLAGS.COMPLETE,
+        },
+      }),
+      this.prismaService.$queryRawTyped(getMostStudiedCategory(memberId)),
+      this.prismaService.review.count({
+        where: {
+          memberId,
+        },
+      }),
+    ]);
+
+    const mostStudiedCategory = mostStudied[0].name;
+
+    return {
+      monthlyAttendanceDays,
+      totalStudiedKeywords,
+      mostStudiedCategory,
+      totalReviews,
+    };
+  }
+
+  private getMonthStartDate(isNext: boolean = false) {
+    const now = new Date();
+
+    console.log(now);
+
+    return new Date(
+      Date.UTC(now.getFullYear(), now.getMonth() + (isNext ? 1 : 0), 1, 0),
+    );
   }
 }
