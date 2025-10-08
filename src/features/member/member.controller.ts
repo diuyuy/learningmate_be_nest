@@ -21,7 +21,7 @@ import {
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
 import type { RequestWithUser } from '../auth/types/request-with-user';
-import { ReviewService } from '../review/review.service';
+import { StatisticService } from '../statistic/statistic.service';
 import { StudyService } from '../study/study.service';
 import { MemberUpdateRequestDto } from './dto';
 import { CreateMemberDto } from './dto/create-member.dto';
@@ -32,7 +32,7 @@ export class MemberController {
   constructor(
     private readonly memberService: MemberService,
     private readonly studyService: StudyService,
-    private readonly reviewService: ReviewService,
+    private readonly statisticService: StatisticService,
   ) {}
 
   @Post()
@@ -69,6 +69,19 @@ export class MemberController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       studyStatus,
+    );
+  }
+
+  @Get('me/study-achivements')
+  async getStudyAchivement(@Req() req: RequestWithUser) {
+    const memberId = BigInt(req.user.id);
+
+    const studyAchivement =
+      await this.statisticService.getStudyAchivement(memberId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      studyAchivement,
     );
   }
 
