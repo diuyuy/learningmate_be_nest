@@ -98,6 +98,18 @@ export class MemberController {
     );
   }
 
+  @Get('me/quiz-statistics')
+  async getQuizStatistics(@Req() req: RequestWithUser) {
+    const memberId = BigInt(req.user.id);
+
+    const quizStats = await this.statisticService.getQuizStats(memberId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      quizStats,
+    );
+  }
+
   @Patch('me')
   async updateMember(
     @Req() req: RequestWithUser,
