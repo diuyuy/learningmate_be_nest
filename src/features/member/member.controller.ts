@@ -20,6 +20,11 @@ import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pipe';
+import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
+import { ArticleScrapSortOption } from 'src/core/types/types';
+import type { PageSortOption } from '../../core/types/types';
+import { ArticleService } from '../article/article.service';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import { StatisticService } from '../statistic/statistic.service';
 import { StudyService } from '../study/study.service';
@@ -33,6 +38,7 @@ export class MemberController {
     private readonly memberService: MemberService,
     private readonly studyService: StudyService,
     private readonly statisticService: StatisticService,
+    private readonly articleService: ArticleService,
   ) {}
 
   @Post()
@@ -107,6 +113,36 @@ export class MemberController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       quizStats,
+    );
+  }
+
+  @Get('me/article-scraps')
+  async getArticleScraps(
+    @Query('page', ParseNonNegativeIntPipe) page: number,
+    @Query('size', ParseNonNegativeIntPipe) size: number,
+    @Query(
+      'sort',
+      new ParsePageSortPipe<ArticleScrapSortOption>([
+        'createdAt',
+        'scrapCounts',
+        'viewsCounts',
+      ]),
+    )
+    sortOption: PageSortOption<ArticleScrapSortOption>,
+    @Req()
+    req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    const pageArticles = await this.articleService.findArticleScraps(memberId, {
+      page,
+      size,
+      ...sortOption,
+    });
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      pageArticles,
     );
   }
 

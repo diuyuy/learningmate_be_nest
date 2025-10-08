@@ -4,6 +4,7 @@ import {
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
 import { CommonException } from 'src/core/exception/common-exception';
+import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleRepository } from './article.repository';
 import { ArticlePreviewResponseDto } from './dto/article-preview-response.dto';
 import { ArticleResponseDto } from './dto/article-response.dto';
@@ -28,6 +29,13 @@ export class ArticleService {
       );
 
     return ArticleResponseDto.from(article);
+  }
+
+  async findArticleScraps(
+    memberId: bigint,
+    pageAble: Pageable<ArticleScrapSortOption>,
+  ) {
+    return this.articleRepository.findArticleScraps(memberId, pageAble);
   }
 
   remove(id: number) {

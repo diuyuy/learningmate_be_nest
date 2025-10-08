@@ -30,7 +30,7 @@ export class ArticleResponseDto {
     this.views = views;
   }
 
-  static from(article: Article): ArticleResponseDto {
+  static from(this: void, article: Article): ArticleResponseDto {
     return new ArticleResponseDto(article);
   }
 }
