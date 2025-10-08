@@ -29,7 +29,7 @@ export class ReviewController {
 
   @Post(':reviewId/likes')
   async likeReview(
-    @Param('reviewid', ParseBigIntPipe) reviewId: bigint,
+    @Param('reviewId', ParseBigIntPipe) reviewId: bigint,
     @Req() req: RequestWithUser,
   ) {
     const memberId = BigInt(req.user.id);
