@@ -10,7 +10,6 @@ export class ArticleRepository {
     title: true,
     content: true,
     publishedAt: true,
-    press: true,
   } as const;
 
   async findManyByKeywordId(keywordId: bigint) {

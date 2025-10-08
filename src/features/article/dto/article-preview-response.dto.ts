@@ -5,20 +5,12 @@ export class ArticlePreviewResponseDto {
   title: string;
   content: string;
   publishedAt: Date;
-  press: string;
 
-  constructor({
-    id,
-    title,
-    content,
-    publishedAt,
-    press,
-  }: ArticlePreviewResponseDto) {
+  constructor({ id, title, content, publishedAt }: ArticlePreviewResponseDto) {
     this.id = id;
     this.title = title;
     this.content = content;
     this.publishedAt = publishedAt;
-    this.press = press;
   }
 
   static from(this: void, article: Article) {
