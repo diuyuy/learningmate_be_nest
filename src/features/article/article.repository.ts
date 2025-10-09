@@ -71,6 +71,14 @@ export class ArticleRepository {
       };
     }
 
+    if (pageAble.sortProp === 'viewsCounts') {
+      return {
+        article: {
+          views: pageAble.sortDirection,
+        },
+      };
+    }
+
     return {
       [pageAble.sortProp]: pageAble.sortDirection,
     };

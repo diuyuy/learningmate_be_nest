@@ -37,8 +37,4 @@ export class ArticleService {
   ) {
     return this.articleRepository.findArticleScraps(memberId, pageAble);
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} article`;
-  }
 }
