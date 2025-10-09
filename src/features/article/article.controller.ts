@@ -15,7 +15,7 @@ import type { ReviewCreateRequestDto } from '../review/dto';
 import { ReviewService } from '../review/review.service';
 import { ArticleService } from './article.service';
 
-@Controller('articles')
+@Controller('v1/articles')
 export class ArticleController {
   constructor(
     private readonly articleService: ArticleService,

@@ -13,7 +13,7 @@ async function bootstrap() {
   });
 
   console.log(process.env.CORS_ORIGIN);
-  app.setGlobalPrefix('/api/v1');
+  app.setGlobalPrefix('/api');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor(), new BigIntInterceptor());

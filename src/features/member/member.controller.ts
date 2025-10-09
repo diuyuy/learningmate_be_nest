@@ -32,7 +32,7 @@ import { MemberUpdateRequestDto } from './dto';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { MemberService } from './member.service';
 
-@Controller('members')
+@Controller('v1/members')
 export class MemberController {
   constructor(
     private readonly memberService: MemberService,

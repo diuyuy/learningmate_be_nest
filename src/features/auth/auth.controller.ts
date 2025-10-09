@@ -34,7 +34,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { RequestWithUser } from './types/request-with-user';
 
 @Public()
-@Controller('auth')
+@Controller('v1/auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

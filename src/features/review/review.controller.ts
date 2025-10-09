@@ -23,7 +23,7 @@ import type { RequestWithUser } from '../auth/types/request-with-user';
 import type { ReviewUpdateRequestDto } from './dto';
 import { ReviewService } from './review.service';
 
-@Controller('reviews')
+@Controller('v1/reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 

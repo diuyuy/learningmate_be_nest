@@ -22,7 +22,7 @@ import { ReviewService } from '../review/review.service';
 import { VideoService } from '../video/video.service';
 import { KeywordService } from './keyword.service';
 
-@Controller('keywords')
+@Controller('v1/keywords')
 export class KeywordController {
   constructor(
     private readonly keywordService: KeywordService,
