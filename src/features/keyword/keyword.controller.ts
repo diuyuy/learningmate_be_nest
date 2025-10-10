@@ -7,7 +7,17 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import {
+  ApiExtraModels,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse as ApiResponseDecorator,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { ApiResponse } from 'src/core/api-response/api-response';
+import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
@@ -17,11 +27,28 @@ import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pi
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption, ReviewSortOption } from 'src/core/types/types';
 import { ArticleService } from '../article/article.service';
+import { ArticlePreviewResponseDto } from '../article/dto/article-preview-response.dto';
 import type { RequestWithUser } from '../auth/types/request-with-user';
+import { PageReviewCountResponseDto } from '../review/dto';
+import { PageReviewResponseDto } from '../review/dto/page-review-response.dto';
 import { ReviewService } from '../review/review.service';
+import { VideoResponseDto } from '../video/dto/video-response.dto';
 import { VideoService } from '../video/video.service';
+import { KeywordResponseDto } from './dto/keyword-response.dto';
+import { TodaysKeywordResponseDto } from './dto/todays-keyword-response.dto';
 import { KeywordService } from './keyword.service';
 
+@ApiTags('Keyword')
+@ApiExtraModels(
+  ApiResponse,
+  PageResponse,
+  KeywordResponseDto,
+  TodaysKeywordResponseDto,
+  ArticlePreviewResponseDto,
+  PageReviewResponseDto,
+  PageReviewCountResponseDto,
+  VideoResponseDto,
+)
 @Controller('v1/keywords')
 export class KeywordController {
   constructor(
@@ -31,6 +58,26 @@ export class KeywordController {
     private readonly videoService: VideoService,
   ) {}
 
+  @ApiOperation({ summary: '기간별 오늘의 키워드 조회' })
+  @ApiQuery({ name: 'startDate', description: '시작 날짜', type: String })
+  @ApiQuery({ name: 'endDate', description: '종료 날짜', type: String })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '오늘의 키워드 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: { $ref: getSchemaPath(TodaysKeywordResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get()
   async findTodaysKeywords(
     @Query('startDate', new ParseDatePipe()) startDate: Date,
@@ -47,6 +94,22 @@ export class KeywordController {
     );
   }
 
+  @ApiOperation({ summary: '키워드 상세 조회' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '키워드 상세 정보 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: { $ref: getSchemaPath(KeywordResponseDto) },
+          },
+        },
+      ],
+    },
+  })
   @Get(':keywordId')
   async findById(@Param('keywordId', ParseBigIntPipe) keywordId: bigint) {
     const keyword = await this.keywordService.findById(keywordId);
@@ -57,6 +120,25 @@ export class KeywordController {
     );
   }
 
+  @ApiOperation({ summary: '키워드별 기사 목록 조회' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '기사 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: { $ref: getSchemaPath(ArticlePreviewResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get(':keywordId/articles')
   async findArticlesByKeyword(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
@@ -70,6 +152,43 @@ export class KeywordController {
     );
   }
 
+  @ApiOperation({ summary: '키워드별 리뷰 목록 조회 (페이징)' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiQuery({ name: 'page', description: '페이지 번호', type: Number })
+  @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
+  @ApiQuery({
+    name: 'sort',
+    description: '정렬 옵션 (createdAt, updatedAt, likeCounts)',
+    required: false,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '리뷰 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              allOf: [
+                { $ref: getSchemaPath(PageResponse) },
+                {
+                  properties: {
+                    items: {
+                      type: 'array',
+                      items: {
+                        $ref: getSchemaPath(PageReviewCountResponseDto),
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get(':keywordId/reviews')
   async findReviewsByKeyword(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
@@ -85,7 +204,7 @@ export class KeywordController {
     )
     sortOption: PageSortOption<ReviewSortOption>,
     @Req() req: RequestWithUser,
-  ) {
+  ): Promise<ApiResponse<PageResponse<PageReviewCountResponseDto>>> {
     const memberId = BigInt(req.user.id);
     const pageAble = { page, size, ...sortOption };
 
@@ -101,6 +220,22 @@ export class KeywordController {
     );
   }
 
+  @ApiOperation({ summary: '키워드별 영상 조회' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '영상 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: { $ref: getSchemaPath(VideoResponseDto) },
+          },
+        },
+      ],
+    },
+  })
   @Get(':keywordId/videos')
   async findVideoByKeyword(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
@@ -113,6 +248,21 @@ export class KeywordController {
     );
   }
 
+  @ApiOperation({ summary: '영상 시청 완료 처리' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '영상 시청 완료 처리 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post(':keywordId/videos')
   async completeVideo(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,

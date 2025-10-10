@@ -10,6 +10,15 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse as ApiResponseDecorator,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { ApiResponse } from 'src/core/api-response/api-response';
 import {
   ResponseCode,
@@ -20,13 +29,36 @@ import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pi
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption, ReviewSortOption } from 'src/core/types/types';
 import type { RequestWithUser } from '../auth/types/request-with-user';
-import type { ReviewUpdateRequestDto } from './dto';
+import { PageReviewCountResponseDto, ReviewUpdateRequestDto } from './dto';
 import { ReviewService } from './review.service';
 
+@ApiTags('Review')
 @Controller('v1/reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @ApiOperation({
+    summary: '리뷰 좋아요',
+    description: '특정 리뷰에 좋아요를 추가합니다.',
+  })
+  @ApiParam({
+    name: 'reviewId',
+    description: '좋아요를 추가할 리뷰 ID',
+    type: String,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '좋아요 추가 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post(':reviewId/likes')
   async likeReview(
     @Param('reviewId', ParseBigIntPipe) reviewId: bigint,
@@ -39,6 +71,45 @@ export class ReviewController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '내 리뷰 조회',
+    description: '로그인한 사용자의 리뷰 목록을 페이지네이션하여 조회합니다.',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '페이지 번호 (0부터 시작)',
+    type: Number,
+    example: 0,
+  })
+  @ApiQuery({
+    name: 'size',
+    description: '페이지 크기',
+    type: Number,
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'sort',
+    description: '정렬 옵션 (createdAt, updatedAt, likeCounts)',
+    type: String,
+    example: 'createdAt,desc',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '내 리뷰 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PageReviewCountResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me')
   async findMyReviews(
     @Query('page', ParseNonNegativeIntPipe) page: number,
@@ -68,6 +139,33 @@ export class ReviewController {
     );
   }
 
+  @ApiOperation({
+    summary: '인기 리뷰 조회',
+    description: '특정 날짜의 인기 리뷰 목록을 조회합니다.',
+  })
+  @ApiQuery({
+    name: 'date',
+    description: '조회할 날짜 (YYYY-MM-DD 형식)',
+    type: String,
+    example: '2025-01-01',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '인기 리뷰 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: { $ref: getSchemaPath(PageReviewCountResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('hot-reviews')
   async findHotReviews(
     @Query('date', new ParseDatePipe()) date: Date,
@@ -83,6 +181,29 @@ export class ReviewController {
     );
   }
 
+  @ApiOperation({
+    summary: '리뷰 수정',
+    description: '특정 리뷰의 내용을 수정합니다.',
+  })
+  @ApiParam({
+    name: 'reviewId',
+    description: '수정할 리뷰 ID',
+    type: String,
+  })
+  @ApiBody({ type: ReviewUpdateRequestDto })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '리뷰 수정 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Patch(':reviewId')
   async updateReview(
     @Param('reviewId', ParseBigIntPipe) reviewId: bigint,
@@ -100,6 +221,28 @@ export class ReviewController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '리뷰 삭제',
+    description: '특정 리뷰를 삭제합니다.',
+  })
+  @ApiParam({
+    name: 'reviewId',
+    description: '삭제할 리뷰 ID',
+    type: String,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '리뷰 삭제 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Delete(':reviewId')
   async remove(
     @Param('reviewId', ParseBigIntPipe) reviewId: bigint,
@@ -112,6 +255,28 @@ export class ReviewController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '리뷰 좋아요 취소',
+    description: '특정 리뷰의 좋아요를 취소합니다.',
+  })
+  @ApiParam({
+    name: 'reviewId',
+    description: '좋아요를 취소할 리뷰 ID',
+    type: String,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '좋아요 취소 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Delete(':reviewId/likes')
   async unlikeReview(
     @Param('reviewId', ParseBigIntPipe) reviewId: bigint,

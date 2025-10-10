@@ -1,9 +1,15 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Keyword, TodaysKeyword } from 'generated/prisma';
 import { KeywordResponseDto } from './keyword-response.dto';
 
 export class TodaysKeywordResponseDto {
+  @ApiProperty({ description: '오늘의 키워드 ID', type: String })
   id: bigint;
+
+  @ApiProperty({ description: '키워드 정보', type: () => KeywordResponseDto })
   keyword: KeywordResponseDto;
+
+  @ApiProperty({ description: '날짜' })
   date: Date;
 
   constructor({ id, keyword, date }: TodaysKeywordResponseDto) {

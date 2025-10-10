@@ -15,7 +15,18 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiExtraModels,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse as ApiResponseDecorator,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { ApiResponse } from 'src/core/api-response/api-response';
+import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
@@ -25,13 +36,26 @@ import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import { ArticleScrapSortOption } from 'src/core/types/types';
 import type { PageSortOption } from '../../core/types/types';
 import { ArticleService } from '../article/article.service';
+import { ArticleResponseDto } from '../article/dto/article-response.dto';
 import type { RequestWithUser } from '../auth/types/request-with-user';
+import { StudyAchivementResponseDto } from '../statistic/dto/study-achivement-response.dto';
 import { StatisticService } from '../statistic/statistic.service';
+import { MyStudyResponseDto } from '../study/dto';
 import { StudyService } from '../study/study.service';
 import { MemberUpdateRequestDto } from './dto';
 import { CreateMemberDto } from './dto/create-member.dto';
+import { MemberResponseDto } from './dto/member-response.dto';
 import { MemberService } from './member.service';
 
+@ApiTags('Member')
+@ApiExtraModels(
+  ApiResponse,
+  PageResponse,
+  MyStudyResponseDto,
+  StudyAchivementResponseDto,
+  ArticleResponseDto,
+  MemberResponseDto,
+)
 @Controller('v1/members')
 export class MemberController {
   constructor(
@@ -41,11 +65,46 @@ export class MemberController {
     private readonly articleService: ArticleService,
   ) {}
 
+  @ApiOperation({
+    summary: '회원 생성',
+    description: '새로운 회원을 생성합니다.',
+  })
+  @ApiBody({ type: CreateMemberDto })
+  @ApiResponseDecorator({
+    status: 201,
+    description: '회원 생성 완료',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 201 },
+        message: { type: 'string', example: '회원 생성 완료' },
+      },
+    },
+  })
   @Post()
   create(@Body() createMemberDto: CreateMemberDto) {
     return this.memberService.create(createMemberDto);
   }
 
+  @ApiOperation({
+    summary: '내 정보 조회',
+    description: '현재 로그인한 회원의 정보를 조회합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '회원 정보 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(MemberResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me')
   async findMember(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
@@ -58,6 +117,38 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 학습 상태 조회',
+    description: '특정 년도와 월의 학습 상태를 조회합니다.',
+  })
+  @ApiQuery({
+    name: 'year',
+    description: '조회할 연도',
+    example: 2025,
+    type: 'integer',
+  })
+  @ApiQuery({
+    name: 'month',
+    description: '조회할 월 (1-12)',
+    example: 1,
+    type: 'integer',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '학습 상태 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(MyStudyResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/study-status')
   async findMyStudyStatus(
     @Query('year', ParseIntPipe) year: number,
@@ -78,6 +169,26 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 학습 성취도 조회',
+    description: '회원의 학습 성취도를 조회합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '학습 성취도 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(StudyAchivementResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/study-achivements')
   async getStudyAchivement(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
@@ -91,6 +202,27 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 카테고리별 학습 통계 조회',
+    description: '회원의 카테고리별 학습 통계를 조회합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '카테고리별 학습 통계 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'object',
+              description: '카테고리별 학습 통계 정보',
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/study-category-statistics')
   async getStudyCatStats(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
@@ -104,6 +236,27 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 퀴즈 통계 조회',
+    description: '회원의 퀴즈 통계를 조회합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '퀴즈 통계 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'object',
+              description: '퀴즈 통계 정보',
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/quiz-statistics')
   async getQuizStatistics(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
@@ -116,6 +269,54 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 스크랩한 기사 목록 조회',
+    description: '회원이 스크랩한 기사 목록을 페이지네이션으로 조회합니다.',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '페이지 번호 (0부터 시작)',
+    example: 0,
+    type: 'integer',
+  })
+  @ApiQuery({
+    name: 'size',
+    description: '페이지당 항목 수',
+    example: 10,
+    type: 'integer',
+  })
+  @ApiQuery({
+    name: 'sort',
+    description: '정렬 옵션 (예: createdAt,desc)',
+    example: 'createdAt,desc',
+    required: false,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '스크랩한 기사 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              allOf: [
+                { $ref: getSchemaPath(PageResponse) },
+                {
+                  properties: {
+                    items: {
+                      type: 'array',
+                      items: { $ref: getSchemaPath(ArticleResponseDto) },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/article-scraps')
   async getArticleScraps(
     @Query('page', ParseNonNegativeIntPipe) page: number,
@@ -131,7 +332,7 @@ export class MemberController {
     sortOption: PageSortOption<ArticleScrapSortOption>,
     @Req()
     req: RequestWithUser,
-  ) {
+  ): Promise<ApiResponse<PageResponse<ArticleResponseDto>>> {
     const memberId = BigInt(req.user.id);
 
     const pageArticles = await this.articleService.findArticleScraps(memberId, {
@@ -146,6 +347,27 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '내 정보 수정',
+    description: '현재 로그인한 회원의 정보를 수정합니다.',
+  })
+  @ApiBody({ type: MemberUpdateRequestDto })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '회원 정보 수정 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(MemberResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @Patch('me')
   async updateMember(
     @Req() req: RequestWithUser,
@@ -164,6 +386,27 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '메인 화면 학습 성취도 조회',
+    description: '메인 화면에 표시할 학습 성취도 데이터를 조회합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '메인 화면 학습 성취도 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'object',
+              description: '메인 화면 학습 성취도 정보',
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('me/main-study-achievements')
   async getMainStudyAchievements(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
@@ -177,6 +420,40 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '프로필 이미지 업데이트',
+    description:
+      '회원의 프로필 이미지를 업데이트합니다. (최대 5MB, jpg/jpeg/png/gif/webp)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: '프로필 이미지 파일',
+        },
+      },
+    },
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '프로필 이미지 업데이트 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(MemberResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @Patch('me/profile-images')
   @UseInterceptors(FileInterceptor('image'))
   async updateProfileImage(
@@ -200,6 +477,23 @@ export class MemberController {
     );
   }
 
+  @ApiOperation({
+    summary: '회원 탈퇴',
+    description: '현재 로그인한 회원을 삭제합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '회원 탈퇴 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Delete('me')
   async remove(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);

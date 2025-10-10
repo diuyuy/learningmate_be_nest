@@ -10,6 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse as ApiResponseDecorator,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ApiResponse } from 'src/core/api-response/api-response';
 import {
@@ -20,6 +28,7 @@ import { EnvSchema } from 'src/core/config/validate-env';
 import { CommonException } from 'src/core/exception/common-exception';
 import { CookieService } from 'src/core/infrastructure/cookie/cookie.service';
 import { ParseEmailPipe } from 'src/core/pipes/parse-email-pipe';
+import { MemberResponseDto } from '../member/dto/member-response.dto';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public';
 import {
@@ -33,6 +42,7 @@ import { GoogleOauthAuthGuard } from './guards/google-oauth-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import type { RequestWithUser } from './types/request-with-user';
 
+@ApiTags('Auth')
 @Public()
 @Controller('v1/auth')
 export class AuthController {
@@ -42,10 +52,18 @@ export class AuthController {
     private readonly configService: ConfigService<EnvSchema, true>,
   ) {}
 
+  @ApiOperation({
+    summary: '구글 OAuth 로그인 요청',
+    description: '구글 OAuth 로그인 페이지로 리다이렉트합니다.',
+  })
   @UseGuards(GoogleOauthAuthGuard)
   @Get('login/oauth2/google')
   googleOauthRequest() {}
 
+  @ApiOperation({
+    summary: '구글 OAuth 콜백',
+    description: '구글 OAuth 인증 후 콜백을 처리합니다.',
+  })
   @UseGuards(GoogleOauthAuthGuard)
   @Get('callback/google')
   async googleOauthCallback(@Req() req: RequestWithUser, @Res() res: Response) {
@@ -58,6 +76,33 @@ export class AuthController {
     res.redirect(`${this.configService.get('AUTH_BASE_URL')}/oauth-redirect`);
   }
 
+  @ApiOperation({
+    summary: '이메일 존재 여부 확인',
+    description: '입력한 이메일이 이미 등록되어 있는지 확인합니다.',
+  })
+  @ApiQuery({
+    name: 'email',
+    description: '확인할 이메일 주소',
+    example: 'user@example.com',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '이메일 존재 여부',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'boolean',
+              example: true,
+              description: '이메일 존재 여부',
+            },
+          },
+        },
+      ],
+    },
+  })
   @Get('emails/existence')
   async checkEmailExists(@Query('email', ParseEmailPipe) email: string) {
     const isExists = await this.authService.checkEmailExists(email);
@@ -68,6 +113,26 @@ export class AuthController {
     );
   }
 
+  @ApiOperation({
+    summary: '이메일/비밀번호 로그인',
+    description: '이메일과 비밀번호로 로그인합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '로그인 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(MemberResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
   @UseGuards(LocalAuthGuard)
   @Post('sign-in')
   async signInByEmailPwd(
@@ -85,6 +150,25 @@ export class AuthController {
     );
   }
 
+  @ApiOperation({
+    summary: '회원가입',
+    description: '새로운 회원을 등록합니다.',
+  })
+  @ApiBody({ type: SignUpRequestDto })
+  @ApiResponseDecorator({
+    status: 201,
+    description: '회원가입 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 201 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.MEMBER_CREATED)
+            .message,
+        },
+      },
+    },
+  })
   @Post('sign-up')
   async signUp(@Body() signUpRequestDto: SignUpRequestDto) {
     await this.authService.signUp(signUpRequestDto);
@@ -94,6 +178,24 @@ export class AuthController {
     );
   }
 
+  @ApiOperation({
+    summary: '인증 코드 발송',
+    description: '이메일로 인증 코드를 발송합니다.',
+  })
+  @ApiBody({ type: AuthCodeGetRequestDto })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '인증 코드 발송 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post('send-auth-code')
   async sendAuthCodeMail(@Body() authCodeRequest: AuthCodeGetRequestDto) {
     await this.authService.sendAuthCodeMail(authCodeRequest.email);
@@ -101,6 +203,24 @@ export class AuthController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '인증 코드 검증',
+    description: '발송된 인증 코드를 검증합니다.',
+  })
+  @ApiBody({ type: AuthCodeValidateRequestDto })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '인증 코드 검증 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post('auth-code/validate')
   async validateAuthCode(
     @Body() authCodeValidateRequestDto: AuthCodeValidateRequestDto,
@@ -109,6 +229,23 @@ export class AuthController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '로그아웃',
+    description: '로그아웃하고 쿠키를 삭제합니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '로그아웃 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post('sign-out')
   async signOut(
     @Req() req: Request,
@@ -131,6 +268,23 @@ export class AuthController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '토큰 갱신',
+    description: '리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '토큰 갱신 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Post('refresh-token')
   async refreshToken(
     @Req() req: Request,
@@ -152,6 +306,21 @@ export class AuthController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
+  @ApiOperation({
+    summary: '비밀번호 재설정 이메일 발송',
+    description: '비밀번호 재설정을 위한 이메일을 발송합니다.',
+  })
+  @ApiBody({ type: SendResetPasswdRequestDto })
+  @ApiResponseDecorator({
+    status: 201,
+    description: '비밀번호 재설정 이메일 발송 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 201 },
+        message: { type: 'string', example: '생성됨' },
+      },
+    },
+  })
   @Post('passwd-resets')
   async sendPasswdResetMail(
     @Body() sendResetPasswdRequestDto: SendResetPasswdRequestDto,
@@ -161,6 +330,24 @@ export class AuthController {
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.CREATED));
   }
 
+  @ApiOperation({
+    summary: '비밀번호 재설정',
+    description: '인증 토큰을 사용하여 비밀번호를 재설정합니다.',
+  })
+  @ApiBody({ type: PasswdResetRequestDto })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '비밀번호 재설정 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
   @Patch()
   async resetPasswd(@Body() passwdResetRequestDto: PasswdResetRequestDto) {
     await this.authService.resetPassword(passwdResetRequestDto);
