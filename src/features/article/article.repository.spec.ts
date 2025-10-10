@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test } from '@nestjs/testing';
 
-import type { MockPrisma } from 'src/__mocks__/mock-prisma-service';
-import { createMockPrisma } from 'src/__mocks__/mock-prisma-service';
+import type { MockPrisma } from 'src/core/infrastructure/prisma-module/__mocks__/mock-prisma-service';
+import { createMockPrisma } from 'src/core/infrastructure/prisma-module/__mocks__/mock-prisma-service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { ArticleRepository } from './article.repository';
 
