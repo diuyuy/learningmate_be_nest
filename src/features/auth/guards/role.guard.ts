@@ -21,6 +21,6 @@ export class RoleGuard implements CanActivate {
   }
 
   matchRoles(targetRoles: string, usersRoles: string) {
-    return targetRoles === usersRoles;
+    return targetRoles.toLowerCase() === usersRoles.toLowerCase();
   }
 }

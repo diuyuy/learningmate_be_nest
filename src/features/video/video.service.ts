@@ -33,7 +33,6 @@ export class VideoService {
 
   async upsertFlag(memberId: bigint, keywordId: bigint) {
     await this.prismaService.$queryRawTyped(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
       upsertStudyFlag(
         memberId,
         keywordId,
@@ -41,5 +40,29 @@ export class VideoService {
         STUDY_FLAGS.VIDEO,
       ),
     );
+  }
+
+  async createVideo(keywordId: bigint, link: string) {
+    const video = await this.prismaService.video.create({
+      data: {
+        keywordId,
+        link,
+      },
+    });
+
+    return VideoResponseDto.from(video);
+  }
+
+  async updateVideo(videoId: bigint, link: string) {
+    const video = await this.prismaService.video.update({
+      data: {
+        link,
+      },
+      where: {
+        id: videoId,
+      },
+    });
+
+    return VideoResponseDto.from(video);
   }
 }

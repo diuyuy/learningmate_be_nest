@@ -3,6 +3,8 @@ import { PageResponse } from 'src/core/api-response/page-response';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleResponseDto } from './dto/article-response.dto';
+import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticleRepository {
@@ -60,6 +62,32 @@ export class ArticleRepository {
     );
 
     return PageResponse.from(articles, totalElements, pageAble);
+  }
+
+  async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
+    const newArticle = await this.prismaService.article.create({
+      data: {
+        keywordId,
+        ...createArticleDto,
+        publishedAt: new Date(),
+        summary: '',
+      },
+    });
+
+    return ArticleResponseDto.from(newArticle);
+  }
+
+  async updateArticle(articleId: bigint, updateArticleDto: UpdateArticleDto) {
+    const article = await this.prismaService.article.update({
+      data: {
+        ...updateArticleDto,
+      },
+      where: {
+        id: articleId,
+      },
+    });
+
+    return ArticleResponseDto.from(article);
   }
 
   orderOption(pageAble: Pageable<ArticleScrapSortOption>) {

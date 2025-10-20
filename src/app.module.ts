@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnv } from './core/config/validate-env';
+import { AdminModule } from './features/admin/admin.module';
 import { ArticleModule } from './features/article/article.module';
 import { AuthModule } from './features/auth/auth.module';
 import { KeywordModule } from './features/keyword/keyword.module';
@@ -18,6 +19,7 @@ import { VideoModule } from './features/video/video.module';
       isGlobal: true,
       validate: validateEnv,
     }),
+    AdminModule,
     AuthModule,
     ArticleModule,
     ReviewModule,

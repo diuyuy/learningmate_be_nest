@@ -15,3 +15,4 @@ export type ArticleScrapSortOption =
   | 'createdAt'
   | 'scrapCounts'
   | 'viewsCounts';
+export type KeywordSortOption = 'id' | 'name';

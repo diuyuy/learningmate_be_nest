@@ -17,7 +17,7 @@ export class KeywordResponseDto {
     this.description = description;
   }
 
-  static from(keyword: Keyword): KeywordResponseDto {
+  static from(this: void, keyword: Keyword): KeywordResponseDto {
     return new KeywordResponseDto(keyword);
   }
 }

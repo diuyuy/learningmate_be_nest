@@ -10,5 +10,6 @@ import { KeywordService } from './keyword.service';
   imports: [PrismaModule, ArticleModule, ReviewModule, VideoModule],
   controllers: [KeywordController],
   providers: [KeywordService],
+  exports: [KeywordService],
 })
 export class KeywordModule {}

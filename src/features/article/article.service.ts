@@ -8,6 +8,8 @@ import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleRepository } from './article.repository';
 import { ArticlePreviewResponseDto } from './dto/article-preview-response.dto';
 import { ArticleResponseDto } from './dto/article-response.dto';
+import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticleService {
@@ -36,5 +38,13 @@ export class ArticleService {
     pageAble: Pageable<ArticleScrapSortOption>,
   ) {
     return this.articleRepository.findArticleScraps(memberId, pageAble);
+  }
+
+  async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
+    return this.articleRepository.createArticle(keywordId, createArticleDto);
+  }
+
+  async updateArticle(articleId: bigint, updateArticleDto: UpdateArticleDto) {
+    return this.articleRepository.updateArticle(articleId, updateArticleDto);
   }
 }

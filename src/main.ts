@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { ApiResponse } from './core/api-response/api-response';
+import { PageResponse } from './core/api-response/page-response';
 import { BigIntInterceptor } from './core/interceptors/bigint.interceptor';
 import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
 import { MemberResponseDto } from './features/member/dto/member-response.dto';
@@ -30,10 +31,12 @@ async function bootstrap() {
 
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, {
-      extraModels: [ApiResponse, MemberResponseDto],
+      extraModels: [ApiResponse, PageResponse, MemberResponseDto],
     });
 
-  SwaggerModule.setup('swagger', app, documentFactory);
+  SwaggerModule.setup('swagger', app, documentFactory, {
+    jsonDocumentUrl: 'swagger/json',
+  });
 
   await app.listen(process.env.PORT ?? 8080);
 }
