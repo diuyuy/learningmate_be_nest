@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Article } from 'generated/prisma';
 
 export class ArticleResponseDto {
-  @ApiProperty({ description: '기사 ID', type: String })
+  @ApiProperty({ description: '기사 ID', type: Number })
   id: bigint;
 
   @ApiProperty({ description: '기사 제목' })
@@ -17,13 +17,13 @@ export class ArticleResponseDto {
   @ApiProperty({ description: '기사 요약' })
   summary: string;
 
-  @ApiProperty({ description: '스크랩 수', type: String })
+  @ApiProperty({ description: '스크랩 수', type: Number })
   scrapCount: bigint;
 
-  @ApiProperty({ description: '조회수', type: String })
+  @ApiProperty({ description: '조회수', type: Number })
   views: bigint;
 
-  @ApiProperty({ description: '키워드 ID', type: String })
+  @ApiProperty({ description: '키워드 ID', type: Number })
   keywordId: bigint;
 
   constructor({

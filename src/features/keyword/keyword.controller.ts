@@ -59,8 +59,8 @@ export class KeywordController {
   ) {}
 
   @ApiOperation({ summary: '기간별 오늘의 키워드 조회' })
-  @ApiQuery({ name: 'startDate', description: '시작 날짜', type: String })
-  @ApiQuery({ name: 'endDate', description: '종료 날짜', type: String })
+  @ApiQuery({ name: 'startDate', description: '시작 날짜', type: Number })
+  @ApiQuery({ name: 'endDate', description: '종료 날짜', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '오늘의 키워드 목록 조회 성공',
@@ -95,7 +95,7 @@ export class KeywordController {
   }
 
   @ApiOperation({ summary: '키워드 상세 조회' })
-  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '키워드 상세 정보 조회 성공',
@@ -121,7 +121,7 @@ export class KeywordController {
   }
 
   @ApiOperation({ summary: '키워드별 기사 목록 조회' })
-  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '기사 목록 조회 성공',
@@ -153,7 +153,7 @@ export class KeywordController {
   }
 
   @ApiOperation({ summary: '키워드별 리뷰 목록 조회 (페이징)' })
-  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
   @ApiQuery({ name: 'page', description: '페이지 번호', type: Number })
   @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
   @ApiQuery({
@@ -221,7 +221,7 @@ export class KeywordController {
   }
 
   @ApiOperation({ summary: '키워드별 영상 조회' })
-  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '영상 조회 성공',
@@ -249,7 +249,7 @@ export class KeywordController {
   }
 
   @ApiOperation({ summary: '영상 시청 완료 처리' })
-  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: String })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '영상 시청 완료 처리 성공',

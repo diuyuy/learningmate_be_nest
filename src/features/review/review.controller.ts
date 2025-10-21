@@ -44,7 +44,7 @@ export class ReviewController {
   @ApiParam({
     name: 'reviewId',
     description: '좋아요를 추가할 리뷰 ID',
-    type: String,
+    type: Number,
   })
   @ApiResponseDecorator({
     status: 200,
@@ -90,7 +90,7 @@ export class ReviewController {
   @ApiQuery({
     name: 'sort',
     description: '정렬 옵션 (createdAt, updatedAt, likeCounts)',
-    type: String,
+    type: Number,
     example: 'createdAt,desc',
   })
   @ApiResponseDecorator({
@@ -146,7 +146,7 @@ export class ReviewController {
   @ApiQuery({
     name: 'date',
     description: '조회할 날짜 (YYYY-MM-DD 형식)',
-    type: String,
+    type: Number,
     example: '2025-01-01',
   })
   @ApiResponseDecorator({
@@ -188,7 +188,7 @@ export class ReviewController {
   @ApiParam({
     name: 'reviewId',
     description: '수정할 리뷰 ID',
-    type: String,
+    type: Number,
   })
   @ApiBody({ type: ReviewUpdateRequestDto })
   @ApiResponseDecorator({
@@ -228,7 +228,7 @@ export class ReviewController {
   @ApiParam({
     name: 'reviewId',
     description: '삭제할 리뷰 ID',
-    type: String,
+    type: Number,
   })
   @ApiResponseDecorator({
     status: 200,
@@ -262,7 +262,7 @@ export class ReviewController {
   @ApiParam({
     name: 'reviewId',
     description: '좋아요를 취소할 리뷰 ID',
-    type: String,
+    type: Number,
   })
   @ApiResponseDecorator({
     status: 200,

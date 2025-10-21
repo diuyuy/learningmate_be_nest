@@ -49,7 +49,7 @@ export class ArticleController {
   ) {}
 
   @ApiOperation({ summary: '기사 상세 조회' })
-  @ApiParam({ name: 'id', description: '기사 ID', type: String })
+  @ApiParam({ name: 'id', description: '기사 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '기사 상세 정보 조회 성공',
@@ -75,7 +75,7 @@ export class ArticleController {
   }
 
   @ApiOperation({ summary: '기사의 퀴즈 목록 조회' })
-  @ApiParam({ name: 'articleId', description: '기사 ID', type: String })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '퀴즈 목록 조회 성공',
@@ -104,7 +104,7 @@ export class ArticleController {
   }
 
   @ApiOperation({ summary: '기사의 리뷰 목록 조회 (페이징)' })
-  @ApiParam({ name: 'articleId', description: '기사 ID', type: String })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
   @ApiQuery({ name: 'page', description: '페이지 번호', type: Number })
   @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
   @ApiQuery({
@@ -172,7 +172,7 @@ export class ArticleController {
   }
 
   @ApiOperation({ summary: '내 리뷰 조회' })
-  @ApiParam({ name: 'articleId', description: '기사 ID', type: String })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '내 리뷰 조회 성공',
@@ -206,7 +206,7 @@ export class ArticleController {
   }
 
   @ApiOperation({ summary: '리뷰 생성' })
-  @ApiParam({ name: 'articleId', description: '기사 ID', type: String })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
   @ApiResponseDecorator({
     status: 201,
     description: '리뷰 생성 성공',
@@ -242,8 +242,8 @@ export class ArticleController {
   }
 
   @ApiOperation({ summary: '퀴즈 풀기' })
-  @ApiParam({ name: 'articleId', description: '기사 ID', type: String })
-  @ApiParam({ name: 'quizId', description: '퀴즈 ID', type: String })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
+  @ApiParam({ name: 'quizId', description: '퀴즈 ID', type: Number })
   @ApiResponseDecorator({
     status: 200,
     description: '퀴즈 풀이 완료',

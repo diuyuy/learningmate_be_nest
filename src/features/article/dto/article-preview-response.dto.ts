@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Article } from 'generated/prisma';
 
 export class ArticlePreviewResponseDto {
-  @ApiProperty({ description: '기사 ID', type: String })
+  @ApiProperty({ description: '기사 ID', type: Number })
   id: bigint;
 
   @ApiProperty({ description: '기사 제목' })

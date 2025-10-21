@@ -21,7 +21,7 @@ export class BigIntInterceptor implements NestInterceptor {
     }
 
     if (typeof data === 'bigint') {
-      return data.toString();
+      return Number(data);
     }
 
     if (Array.isArray(data)) {

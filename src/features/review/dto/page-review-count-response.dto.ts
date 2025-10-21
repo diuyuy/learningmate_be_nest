@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ReviewFromPrisma } from '../types/types';
 
 export class PageReviewCountResponseDto {
-  @ApiProperty({ description: '리뷰 ID', type: String })
+  @ApiProperty({ description: '리뷰 ID', type: Number })
   id: bigint;
 
-  @ApiProperty({ description: '기사 ID', type: String })
+  @ApiProperty({ description: '기사 ID', type: Number })
   articleId: bigint;
 
-  @ApiProperty({ description: '작성자 ID', type: String })
+  @ApiProperty({ description: '작성자 ID', type: Number })
   memberId: bigint;
 
   @ApiProperty({ description: '생성일' })
@@ -23,7 +23,7 @@ export class PageReviewCountResponseDto {
   @ApiProperty({ description: '기사 제목' })
   title: string;
 
-  @ApiProperty({ description: '좋아요 수', type: String })
+  @ApiProperty({ description: '좋아요 수', type: Number })
   likeCount: bigint;
 
   @ApiProperty({ description: '내가 좋아요를 눌렀는지 여부' })

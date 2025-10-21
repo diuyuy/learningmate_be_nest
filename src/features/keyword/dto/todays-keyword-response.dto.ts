@@ -3,7 +3,7 @@ import { Keyword, TodaysKeyword } from 'generated/prisma';
 import { KeywordResponseDto } from './keyword-response.dto';
 
 export class TodaysKeywordResponseDto {
-  @ApiProperty({ description: '오늘의 키워드 ID', type: String })
+  @ApiProperty({ description: '오늘의 키워드 ID', type: Number })
   id: bigint;
 
   @ApiProperty({ description: '키워드 정보', type: () => KeywordResponseDto })

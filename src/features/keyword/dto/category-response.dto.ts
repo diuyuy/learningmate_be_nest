@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CategoryResponseDto {
   @ApiProperty({
     description: '카테고리 ID',
-    type: String,
+    type: Number,
     example: 1,
   })
   id: bigint;

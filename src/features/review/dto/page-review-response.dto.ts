@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PageReviewResponseDto {
-  @ApiProperty({ description: '리뷰 ID', type: String })
+  @ApiProperty({ description: '리뷰 ID', type: Number })
   id: bigint;
 
   @ApiProperty({ description: '생성일' })
