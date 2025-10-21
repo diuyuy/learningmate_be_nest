@@ -60,6 +60,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 claude_contexts
 .serena
 CLAUDE.md
+*.sql
 
 # prisma
 /generated/prisma

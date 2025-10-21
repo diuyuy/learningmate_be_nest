@@ -19,7 +19,8 @@ export class KeywordDetailResponseDto {
 
   @ApiProperty({
     description: '관련 영상 정보',
-    type: () => [VideoResponseDto, null],
+    type: () => [VideoResponseDto],
+    nullable: true,
   })
   video: VideoResponseDto | null;
 
