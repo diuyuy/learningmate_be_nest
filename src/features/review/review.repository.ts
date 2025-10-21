@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrivateResultType } from 'generated/prisma/runtime/library';
 import { getHotReviews, upsertStudyFlag } from 'generated/prisma/sql';
 import { PageResponse } from 'src/core/api-response/page-response';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
@@ -10,7 +9,6 @@ import {
   PageReviewResponseDto,
   ReviewCreateRequestDto,
 } from './dto';
-import { GetHotReviewResult } from './types/types';
 
 @Injectable()
 export class ReviewRepository {
@@ -228,11 +226,9 @@ export class ReviewRepository {
     pageSize: number,
     offset: number,
   ) {
-    const queryResult = (await this.prismaService.$queryRawTyped(
+    return this.prismaService.$queryRawTyped(
       getHotReviews(memberId, start, end, pageSize, offset),
-    )) as unknown as GetHotReviewResult[];
-
-    return queryResult.map((v) => v[PrivateResultType]);
+    );
   }
 
   async getLikeCount(reviewId: bigint) {
