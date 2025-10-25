@@ -35,8 +35,8 @@ async function bootstrap() {
         extraModels: [ApiResponse, PageResponse, MemberResponseDto],
       });
 
-    SwaggerModule.setup('swagger', app, documentFactory, {
-      jsonDocumentUrl: 'swagger/json',
+    SwaggerModule.setup('api/swagger', app, documentFactory, {
+      jsonDocumentUrl: 'api/swagger/json',
     });
   }
 
