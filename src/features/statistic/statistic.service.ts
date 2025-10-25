@@ -1,9 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import {
-  getMostStudiedCategory,
-  getStudyCategoryStatistics,
-  getWatchedVideoCounts,
-} from 'generated/prisma/sql';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { MainStudyAchievementsResponseDto } from './dto/main-study-achievement-response.dto';
@@ -34,7 +29,10 @@ export class StatisticService {
           },
         }),
 
-        this.prismaService.$queryRawTyped(getWatchedVideoCounts(memberId)),
+        this.prismaService.$queryRaw<{ watchedVideoCounts: bigint }[]>`
+          SELECT COUNT(*) as watchedVideoCounts FROM Study
+          WHERE memberId = ${memberId} AND (studyStats & 4) > 0
+        `,
       ]);
 
     return StudyAchivementResponseDto.from({
@@ -46,9 +44,15 @@ export class StatisticService {
   }
 
   async getStudyCategoryStats(memberId: bigint) {
-    const queryResult = await this.prismaService.$queryRawTyped(
-      getStudyCategoryStatistics(memberId),
-    );
+    const queryResult = await this.prismaService.$queryRaw<
+      { name: string | null; totalCounts: bigint }[]
+    >`
+      SELECT c.name, COUNT(s.studyStats) as totalCounts FROM Study AS s
+      INNER JOIN Keyword AS k ON k.id = s.keywordId
+      INNER JOIN Category AS c ON k.categoryId = c.id
+      WHERE s.memberId = ${memberId}
+      GROUP BY c.name WITH ROLLUP
+    `;
 
     return StudyCatStatsResponseDto.from(queryResult);
   }
@@ -99,7 +103,16 @@ export class StatisticService {
           studyStats: STUDY_FLAGS.COMPLETE,
         },
       }),
-      this.prismaService.$queryRawTyped(getMostStudiedCategory(memberId)),
+      this.prismaService.$queryRaw<{ name: string; counts: bigint }[]>`
+        SELECT c.name, COUNT(*) AS counts
+        FROM Study AS s
+        INNER JOIN Keyword AS k ON k.id = s.keywordId
+        INNER JOIN Category AS c ON k.categoryId = c.id
+        WHERE s.memberId = ${memberId}
+        GROUP BY c.name
+        ORDER BY counts DESC
+        LIMIT 1
+      `,
       this.prismaService.review.count({
         where: {
           memberId,

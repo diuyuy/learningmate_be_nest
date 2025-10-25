@@ -33,13 +33,20 @@ import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { Roles } from '../auth/decorators/roles';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { KeywordDetailResponseDto } from '../keyword/dto/keyword-detail-response.dto';
+import { QuizResponseDto } from '../quiz/dto/quiz-response.dto';
+import { UpdateQuizRequestDto } from '../quiz/dto/update-quiz-request.dto';
 import { CreateVideoRequestDto } from '../video/dto/create-video-request.dto';
 import { UpdateVideoRequestDto } from '../video/dto/update-video-request.dto';
 import { VideoResponseDto } from '../video/dto/video-response.dto';
 import { AdminService } from './admin.service';
 
 @ApiTags('Admin')
-@ApiExtraModels(KeywordDetailResponseDto, VideoResponseDto, ArticleResponseDto)
+@ApiExtraModels(
+  KeywordDetailResponseDto,
+  VideoResponseDto,
+  ArticleResponseDto,
+  QuizResponseDto,
+)
 @Roles(['admin'])
 @UseGuards(RoleGuard)
 @Controller('v1/admin')
@@ -109,6 +116,42 @@ export class AdminController {
   }
 
   @ApiOperation({
+    summary: '기사의 퀴즈 목록 조회',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '퀴즈 목록 조회 성공',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponse),
+        },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: {
+                $ref: getSchemaPath(QuizResponseDto),
+              },
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Get('articles/:articleId/quizzes')
+  async findQuizzsByArticleId(
+    @Param('articleId', ParseBigIntPipe) articleId: bigint,
+  ) {
+    const quizzes = await this.adminService.findQuizzes(articleId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      quizzes,
+    );
+  }
+
+  @ApiOperation({
     summary: '키워드에 영상 추가',
   })
   @ApiResponseDecorator({
@@ -129,7 +172,7 @@ export class AdminController {
       ],
     },
   })
-  @Post('keywords/:keywordId/video-urls')
+  @Post('keywords/:keywordId/videos')
   async createVideoOfKeyword(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
     @Body() createVideoDto: CreateVideoRequestDto,
@@ -253,6 +296,43 @@ export class AdminController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       article,
+    );
+  }
+
+  @ApiOperation({
+    summary: '퀴즈 수정',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '퀴즈 수정 성공',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponse),
+        },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(QuizResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Patch('quizzes/:quizId')
+  async updateQuiz(
+    @Param('quizId', ParseBigIntPipe) quizId: bigint,
+    @Body() updateQuizRequestDto: UpdateQuizRequestDto,
+  ) {
+    const quiz = await this.adminService.updateQuiz(
+      quizId,
+      updateQuizRequestDto,
+    );
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      quiz,
     );
   }
 }

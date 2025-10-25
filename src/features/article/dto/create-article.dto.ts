@@ -22,4 +22,14 @@ export class CreateArticleDto {
   @IsString()
   @MinLength(1)
   content: string;
+
+  @ApiProperty({
+    description: '기사 요약',
+    minLength: 1,
+    example:
+      '한국은행이 금융통화위원회를 열고 기준금리를 현행 3.5%로 유지하기로 결정했다.',
+  })
+  @IsString()
+  @MinLength(1)
+  summary: string;
 }

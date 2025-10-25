@@ -4,6 +4,8 @@ import { ArticleService } from '../article/article.service';
 import { CreateArticleDto } from '../article/dto/create-article.dto';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { KeywordService } from '../keyword/keyword.service';
+import { UpdateQuizRequestDto } from '../quiz/dto/update-quiz-request.dto';
+import { QuizService } from '../quiz/quiz.service';
 import { VideoService } from '../video/video.service';
 
 @Injectable()
@@ -12,10 +14,15 @@ export class AdminService {
     private readonly articleService: ArticleService,
     private readonly keywordService: KeywordService,
     private readonly videoService: VideoService,
+    private readonly quizService: QuizService,
   ) {}
 
   async findKeywords(pageAble: Pageable<KeywordSortOption>) {
     return this.keywordService.findKeywords(pageAble);
+  }
+
+  async findQuizzes(articleId: bigint) {
+    return this.quizService.findQuizDetailsByArticleId(articleId);
   }
 
   async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
@@ -32,5 +39,9 @@ export class AdminService {
 
   async updateVideo(videoId: bigint, link: string) {
     return this.videoService.updateVideo(videoId, link);
+  }
+
+  async updateQuiz(quizId: bigint, updateQuizRequestDto: UpdateQuizRequestDto) {
+    return this.quizService.updateQuiz(quizId, updateQuizRequestDto);
   }
 }

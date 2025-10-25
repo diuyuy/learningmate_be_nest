@@ -146,7 +146,7 @@ export class ReviewController {
   @ApiQuery({
     name: 'date',
     description: '조회할 날짜 (YYYY-MM-DD 형식)',
-    type: Number,
+    type: String,
     example: '2025-01-01',
   })
   @ApiResponseDecorator({

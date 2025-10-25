@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { upsertStudyFlag } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
@@ -9,6 +8,7 @@ import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.serv
 import { STUDY_FLAGS } from '../../core/constants/study-flag';
 import { MemberQuizRequestDto } from './dto/member-quiz-request.dto';
 import { QuizResponseDto } from './dto/quiz-response.dto';
+import { UpdateQuizRequestDto } from './dto/update-quiz-request.dto';
 
 @Injectable()
 export class QuizService {
@@ -22,6 +22,27 @@ export class QuizService {
     });
 
     return QuizResponseDto.fromList(quizzes);
+  }
+
+  async findQuizDetailsByArticleId(articleId: bigint) {
+    const quizzes = await this.prismaService.quiz.findMany({
+      where: {
+        articleId,
+      },
+    });
+
+    return quizzes.map(QuizResponseDto.from);
+  }
+
+  async updateQuiz(id: bigint, updateQuizRequestDto: UpdateQuizRequestDto) {
+    const quiz = await this.prismaService.quiz.update({
+      data: updateQuizRequestDto,
+      where: {
+        id,
+      },
+    });
+
+    return QuizResponseDto.from(quiz);
   }
 
   async solveQuiz({
@@ -144,15 +165,12 @@ export class QuizService {
     });
 
     if (solvedQuizzesCount >= 5) {
-      await prisma.$queryRawTyped(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
-        upsertStudyFlag(
-          memberId,
-          keywordId,
-          STUDY_FLAGS.QUIZ,
-          STUDY_FLAGS.QUIZ,
-        ),
-      );
+      await prisma.$queryRaw`
+      INSERT INTO Study(memberId, keywordId, studyStats)
+        VALUES(${memberId}, ${keywordId}, ${STUDY_FLAGS.QUIZ})
+        ON DUPLICATE KEY UPDATE
+        studyStats = studyStats | ${STUDY_FLAGS.QUIZ}
+    `;
     }
   }
 }

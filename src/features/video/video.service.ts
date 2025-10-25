@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { upsertStudyFlag } from 'generated/prisma/sql';
 import {
   ResponseCode,
   ResponseStatusFactory,
@@ -32,14 +31,12 @@ export class VideoService {
   }
 
   async upsertFlag(memberId: bigint, keywordId: bigint) {
-    await this.prismaService.$queryRawTyped(
-      upsertStudyFlag(
-        memberId,
-        keywordId,
-        STUDY_FLAGS.VIDEO,
-        STUDY_FLAGS.VIDEO,
-      ),
-    );
+    await this.prismaService.$queryRaw`
+      INSERT INTO Study(memberId, keywordId, studyStats)
+        VALUES(${memberId}, ${keywordId}, ${STUDY_FLAGS.VIDEO})
+        ON DUPLICATE KEY UPDATE
+        studyStats = studyStats | ${STUDY_FLAGS.VIDEO}
+    `;
   }
 
   async createVideo(keywordId: bigint, link: string) {

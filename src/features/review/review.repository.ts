@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { getHotReviews, upsertStudyFlag } from 'generated/prisma/sql';
 import { PageResponse } from 'src/core/api-response/page-response';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
@@ -38,14 +37,12 @@ export class ReviewRepository {
         select: this.reviewSelect,
       });
 
-      await prisma.$queryRawTyped(
-        upsertStudyFlag(
-          memberId,
-          review.article.keywordId,
-          STUDY_FLAGS.REVIEW,
-          STUDY_FLAGS.REVIEW,
-        ),
-      );
+      await prisma.$queryRaw`
+        INSERT INTO Study(memberId, keywordId, studyStats)
+          VALUES(${memberId}, ${review.article.keywordId}, ${STUDY_FLAGS.REVIEW})
+          ON DUPLICATE KEY UPDATE
+          studyStats = studyStats | ${STUDY_FLAGS.REVIEW}
+      `;
 
       return review;
     });
@@ -226,9 +223,29 @@ export class ReviewRepository {
     pageSize: number,
     offset: number,
   ) {
-    return this.prismaService.$queryRawTyped(
-      getHotReviews(memberId, start, end, pageSize, offset),
-    );
+    return this.prismaService.$queryRaw<PageReviewCountResponseDto[]>`
+      SELECT
+        r.id,
+        r.articleId,
+        r.memberId,
+        r.createdAt,
+        r.content1,
+        m.nickname,
+        a.title,
+        COUNT(lr.id) as "likeCount",
+        CASE WHEN SUM(CASE WHEN lr.memberId = ${memberId} THEN 1 ELSE 0 END) > 0
+          THEN TRUE ELSE FALSE END as "likedByMe"
+      FROM Review r
+      INNER JOIN Member m ON m.id = r.memberId
+      INNER JOIN Article a ON a.id = r.articleId
+      LEFT JOIN LikeReview lr ON lr.reviewId = r.id
+      WHERE r.createdAt >= ${start}
+        AND r.createdAt < ${end}
+      GROUP BY r.id, r.articleId, r.memberId, r.createdAt, r.content1, m.nickname, a.title
+      ORDER BY COUNT(lr.id) DESC, r.createdAt DESC
+      LIMIT ${pageSize}
+      OFFSET ${offset}
+    `;
   }
 
   async getLikeCount(reviewId: bigint) {

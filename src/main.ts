@@ -22,21 +22,23 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor(), new BigIntInterceptor());
 
-  const config = new DocumentBuilder()
-    .setTitle('Learningmate API Documentation')
-    .setDescription('The Learningmate API description')
-    .setVersion('1.0')
-    .addTag('Learningmate')
-    .build();
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Learningmate API Documentation')
+      .setDescription('The Learningmate API description')
+      .setVersion('1.0')
+      .addTag('Learningmate')
+      .build();
 
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, config, {
-      extraModels: [ApiResponse, PageResponse, MemberResponseDto],
+    const documentFactory = () =>
+      SwaggerModule.createDocument(app, config, {
+        extraModels: [ApiResponse, PageResponse, MemberResponseDto],
+      });
+
+    SwaggerModule.setup('swagger', app, documentFactory, {
+      jsonDocumentUrl: 'swagger/json',
     });
-
-  SwaggerModule.setup('swagger', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/json',
-  });
+  }
 
   await app.listen(process.env.PORT ?? 8080);
 }

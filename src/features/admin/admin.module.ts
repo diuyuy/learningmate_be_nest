@@ -3,6 +3,7 @@ import { PrismaModule } from 'src/core/infrastructure/prisma-module/prisma.modul
 import { ArticleModule } from '../article/article.module';
 import { AuthModule } from '../auth/auth.module';
 import { KeywordModule } from '../keyword/keyword.module';
+import { QuizModule } from '../quiz/quiz.module';
 import { VideoModule } from '../video/video.module';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
@@ -14,6 +15,7 @@ import { AdminService } from './admin.service';
     ArticleModule,
     VideoModule,
     KeywordModule,
+    QuizModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

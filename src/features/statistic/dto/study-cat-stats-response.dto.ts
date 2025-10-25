@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { getStudyCategoryStatistics } from 'generated/prisma/sql';
 import { CATEGORY_NAME_MAP } from 'src/core/constants/category-name-map';
 
 export class StudyCatStatsResponseDto {
@@ -61,7 +60,12 @@ export class StudyCatStatsResponseDto {
     this.society = society ?? 0;
   }
 
-  static from(result: getStudyCategoryStatistics.Result[]) {
+  static from(
+    result: {
+      name: string | null;
+      totalCounts: bigint;
+    }[],
+  ) {
     const studyCatStats: Partial<StudyCatStatsResponseDto> = {};
     result.forEach((v) => {
       if (v.name) {

@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Quiz } from 'generated/prisma';
 
 type QuizWithArticle = {
@@ -15,17 +16,31 @@ type QuizWithArticle = {
 };
 
 export class QuizResponseDto {
+  @ApiProperty({ description: '퀴즈 ID', type: 'string' })
   id: bigint;
+
+  @ApiProperty({ description: '퀴즈 설명' })
   description: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 1' })
   question1: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 2' })
   question2: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 3' })
   question3: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 4' })
   question4: string;
 
+  @ApiPropertyOptional({ description: '퀴즈 정답' })
   answer?: string;
 
+  @ApiPropertyOptional({ description: '퀴즈 해설' })
   explanation?: string;
 
+  @ApiPropertyOptional({ description: '퀴즈 채점 결과 (정답/오답)' })
   status?: string;
 
   constructor({
@@ -48,6 +63,10 @@ export class QuizResponseDto {
     this.answer = answer;
     this.explanation = explanation;
     this.status = status;
+  }
+
+  static from(this: void, quiz: Quiz): QuizResponseDto {
+    return new QuizResponseDto(quiz);
   }
 
   static fromList(quizzes: Quiz[]): QuizResponseDto[] {
