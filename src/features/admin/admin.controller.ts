@@ -61,7 +61,7 @@ export class AdminController {
   @ApiQuery({
     name: 'sort',
     description: '정렬 옵션 ("id", "name")',
-    type: Number,
+    type: String,
     required: false,
   })
   @ApiResponseDecorator({

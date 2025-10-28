@@ -1,1 +1,1 @@
-export type ModelProvider = 'openai' | 'grok';
+export type ModelProvider = 'gemini' | 'openai' | 'grok';

@@ -1,3 +1,4 @@
+import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
 import { xai } from '@ai-sdk/xai';
 import { Injectable } from '@nestjs/common';
@@ -10,7 +11,11 @@ export class AiService {
   constructor(private readonly redisService: IoRedisService) {}
 
   private readonly MAX_LIMIT_TOKENS = 80 * 10000;
-  private readonly modelProviders: ModelProvider[] = ['openai', 'grok'];
+  private readonly modelProviders: ModelProvider[] = [
+    'gemini',
+    'openai',
+    'grok',
+  ];
 
   async generateObj<T>(prompt: string, schema: Schema<T>) {
     for (const modelProvider of this.modelProviders) {
@@ -66,6 +71,8 @@ export class AiService {
 
   private getModel(modelProvider: ModelProvider) {
     switch (modelProvider) {
+      case 'gemini':
+        return google('gemini-2.5-flash');
       case 'openai':
         return openai('chatgpt-4o-latest');
       default:
