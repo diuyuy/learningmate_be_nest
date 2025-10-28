@@ -189,7 +189,7 @@ export class MemberController {
       ],
     },
   })
-  @Get('me/study-achivements')
+  @Get('me/study-achievements')
   async getStudyAchivement(@Req() req: RequestWithUser) {
     const memberId = BigInt(req.user.id);
 
