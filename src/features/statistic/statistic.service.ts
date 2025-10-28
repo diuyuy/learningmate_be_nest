@@ -15,7 +15,9 @@ export class StatisticService {
         this.prismaService.study.count({
           where: {
             memberId,
-            studyStats: STUDY_FLAGS.COMPLETE,
+            studyStats: {
+              gte: 1,
+            },
           },
         }),
         this.prismaService.review.count({
@@ -132,8 +134,6 @@ export class StatisticService {
 
   private getMonthStartDate(isNext: boolean = false) {
     const now = new Date();
-
-    console.log(now);
 
     return new Date(
       Date.UTC(now.getFullYear(), now.getMonth() + (isNext ? 1 : 0), 1, 0),

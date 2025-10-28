@@ -1,6 +1,6 @@
 export const STUDY_FLAGS = {
-  VIDEO: 1, // 001
-  QUIZ: 2, // 010
-  REVIEW: 4, // 100
+  VIDEO: 4, // 100
+  REVIEW: 2, // 010
+  QUIZ: 1, // 001
   COMPLETE: 7, //111
 };
