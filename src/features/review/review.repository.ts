@@ -30,9 +30,9 @@ export class ReviewRepository {
     return this.prismaService.$transaction(async (prisma) => {
       const review = await prisma.review.create({
         data: {
+          ...data,
           memberId,
           articleId,
-          ...data,
         },
         select: this.reviewSelect,
       });
