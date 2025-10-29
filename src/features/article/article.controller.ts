@@ -258,7 +258,7 @@ export class ArticleController {
     description: '퀴즈 풀이 완료',
     schema: {
       properties: {
-        status: { type: 'number', example: 200 },
+        status: { type: 'number', example: 201 },
         message: {
           type: 'string',
           example: ResponseStatusFactory.create(ResponseCode.OK).message,
@@ -275,14 +275,17 @@ export class ArticleController {
   ) {
     const memberId = BigInt(req.user.id);
 
-    await this.quizService.solveQuiz({
+    const quizResponse = await this.quizService.solveQuiz({
       memberId,
       articleId,
       quizId,
       memberQuizRequest,
     });
 
-    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.CREATED),
+      quizResponse,
+    );
   }
 
   @ApiOperation({ summary: '기사 스크랩' })
