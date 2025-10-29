@@ -40,6 +40,14 @@ export class ArticleService {
     return this.articleRepository.findArticleScraps(memberId, pageAble);
   }
 
+  async scrapArticle(memberId: bigint, articleId: bigint) {
+    await this.articleRepository.scrapArticle(memberId, articleId);
+  }
+
+  async cancleScrap(memberId: bigint, articleId: bigint) {
+    await this.articleRepository.cancelScrap(memberId, articleId);
+  }
+
   async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
     return this.articleRepository.createArticle(keywordId, createArticleDto);
   }

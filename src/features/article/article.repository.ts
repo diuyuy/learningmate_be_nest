@@ -64,6 +64,26 @@ export class ArticleRepository {
     return PageResponse.from(articles, totalElements, pageAble);
   }
 
+  async scrapArticle(memberId: bigint, articleId: bigint) {
+    await this.prismaService.articleScrap.create({
+      data: {
+        memberId,
+        articleId,
+      },
+    });
+  }
+
+  async cancelScrap(memberId: bigint, articleId: bigint) {
+    await this.prismaService.articleScrap.delete({
+      where: {
+        memberId_articleId: {
+          memberId,
+          articleId,
+        },
+      },
+    });
+  }
+
   async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
     const newArticle = await this.prismaService.article.create({
       data: {

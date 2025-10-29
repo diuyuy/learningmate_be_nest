@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOperation,
@@ -272,6 +281,60 @@ export class ArticleController {
       quizId,
       memberQuizRequest,
     });
+
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
+  }
+
+  @ApiOperation({ summary: '기사 스크랩' })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
+  @ApiResponseDecorator({
+    status: 201,
+    description: '기사 스크랩 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 201 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.CREATED).message,
+        },
+      },
+    },
+  })
+  @Post(':articleId/article-scraps')
+  async scrapArticle(
+    @Param('articleId', ParseBigIntPipe) articleId: bigint,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    await this.articleService.scrapArticle(memberId, articleId);
+
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.CREATED));
+  }
+
+  @ApiOperation({ summary: '기사 스크랩 취소' })
+  @ApiParam({ name: 'articleId', description: '기사 ID', type: Number })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '기사 스크랩 취소 성공',
+    schema: {
+      properties: {
+        status: { type: 'number', example: 200 },
+        message: {
+          type: 'string',
+          example: ResponseStatusFactory.create(ResponseCode.OK).message,
+        },
+      },
+    },
+  })
+  @Delete(':articleId/article-scraps')
+  async cancelScrap(
+    @Param('articleId', ParseBigIntPipe) articleId: bigint,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    await this.articleService.cancleScrap(memberId, articleId);
 
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
