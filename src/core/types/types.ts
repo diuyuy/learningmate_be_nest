@@ -16,3 +16,4 @@ export type ArticleScrapSortOption =
   | 'scrapCounts'
   | 'viewsCounts';
 export type KeywordSortOption = 'id' | 'name';
+export type IncorrectQuizSortOption = 'createdAt';

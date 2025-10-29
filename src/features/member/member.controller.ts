@@ -34,10 +34,16 @@ import {
 import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pipe';
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import { ArticleScrapSortOption } from 'src/core/types/types';
-import type { PageSortOption } from '../../core/types/types';
+import type {
+  IncorrectQuizSortOption,
+  PageSortOption,
+} from '../../core/types/types';
 import { ArticleService } from '../article/article.service';
 import { ArticleResponseDto } from '../article/dto/article-response.dto';
 import type { RequestWithUser } from '../auth/types/request-with-user';
+import { IncorrectQuizResponseDto } from '../quiz/dto/incorrect-quiz-response.dto';
+import { QuizService } from '../quiz/quiz.service';
+import { QuizStatsResponseDto } from '../statistic/dto/quiz-stats-response.dto';
 import { StudyAchivementResponseDto } from '../statistic/dto/study-achivement-response.dto';
 import { StatisticService } from '../statistic/statistic.service';
 import { MyStudyResponseDto } from '../study/dto';
@@ -55,6 +61,8 @@ import { MemberService } from './member.service';
   StudyAchivementResponseDto,
   ArticleResponseDto,
   MemberResponseDto,
+  QuizStatsResponseDto,
+  IncorrectQuizResponseDto,
 )
 @Controller('v1/members')
 export class MemberController {
@@ -63,6 +71,7 @@ export class MemberController {
     private readonly studyService: StudyService,
     private readonly statisticService: StatisticService,
     private readonly articleService: ArticleService,
+    private readonly quizService: QuizService,
   ) {}
 
   @ApiOperation({
@@ -249,8 +258,7 @@ export class MemberController {
         {
           properties: {
             result: {
-              type: 'object',
-              description: '퀴즈 통계 정보',
+              $ref: getSchemaPath(QuizStatsResponseDto),
             },
           },
         },
@@ -266,6 +274,82 @@ export class MemberController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       quizStats,
+    );
+  }
+
+  @ApiOperation({
+    summary: '내 오답 퀴즈 목록 조회',
+    description: '회원이 틀린 퀴즈 목록을 페이지네이션으로 조회합니다.',
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '페이지 번호 (0부터 시작)',
+    example: 0,
+    type: 'integer',
+  })
+  @ApiQuery({
+    name: 'size',
+    description: '페이지당 항목 수',
+    example: 10,
+    type: 'integer',
+  })
+  @ApiQuery({
+    name: 'sort',
+    description: '정렬 옵션 (예: createdAt,desc). 가능한 정렬 속성: createdAt',
+    example: 'createdAt,desc',
+    required: false,
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '오답 퀴즈 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              allOf: [
+                { $ref: getSchemaPath(PageResponse) },
+                {
+                  properties: {
+                    items: {
+                      type: 'array',
+                      items: { $ref: getSchemaPath(IncorrectQuizResponseDto) },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Get('me/incorrect-quizzes')
+  async getIncorrectQuizzes(
+    @Query('page', ParseNonNegativeIntPipe) page: number,
+    @Query('size', ParseNonNegativeIntPipe) size: number,
+    @Query(
+      'sort',
+      new ParsePageSortPipe<IncorrectQuizSortOption>(['createdAt']),
+    )
+    sort: PageSortOption<IncorrectQuizSortOption>,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    const incorrectQuizzes = await this.quizService.findIncorrectQuizzes(
+      memberId,
+      {
+        page,
+        size,
+        ...sort,
+      },
+    );
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      incorrectQuizzes,
     );
   }
 

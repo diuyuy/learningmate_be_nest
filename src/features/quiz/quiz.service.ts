@@ -1,11 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from 'generated/prisma';
+import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
 import { CommonException } from 'src/core/exception/common-exception';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
+import { IncorrectQuizSortOption, Pageable } from 'src/core/types/types';
 import { STUDY_FLAGS } from '../../core/constants/study-flag';
+import {
+  IncorrectQuizQueryResult,
+  IncorrectQuizResponseDto,
+} from './dto/incorrect-quiz-response.dto';
 import { MemberQuizRequestDto } from './dto/member-quiz-request.dto';
 import { QuizResponseDto } from './dto/quiz-response.dto';
 import { UpdateQuizRequestDto } from './dto/update-quiz-request.dto';
@@ -32,6 +39,36 @@ export class QuizService {
     });
 
     return quizzes.map(QuizResponseDto.from);
+  }
+
+  async findIncorrectQuizzes(
+    memberId: bigint,
+    pageAble: Pageable<IncorrectQuizSortOption>,
+  ) {
+    const orderByClause = Prisma.sql`ORDER BY mq.${Prisma.raw(`${pageAble.sortProp}`)} ${Prisma.raw(pageAble.sortDirection)}`;
+
+    const [incorrectQuizzes, [{ counts: totalElements }]] = await Promise.all([
+      this.prismaService.$queryRaw<
+        IncorrectQuizQueryResult[]
+      >`SELECT q.id, q.description, q.explanation, q.articleId, q.answer, mq.createdAt AS answerCreatedAt, mq.memberAnswer, a.title FROM MemberQuiz AS mq
+      INNER JOIN Quiz AS q ON q.id = mq.quizId
+      INNER JOIN Article AS a ON a.id = q.articleId
+      WHERE mq.memberId = ${memberId} and mq.memberAnswer <> q.answer
+      ${orderByClause}
+      LIMIT ${pageAble.size}
+      OFFSET ${pageAble.page * pageAble.size};`,
+      this.prismaService.$queryRaw<
+        { counts: bigint }[]
+      >`SELECT COUNT(*) AS counts FROM MemberQuiz AS mq
+        INNER JOIN Quiz AS q ON q.id = mq.quizId
+        WHERE mq.memberId = ${memberId} AND mq.memberAnswer != q.answer; `,
+    ]);
+
+    const items = incorrectQuizzes.map(IncorrectQuizResponseDto.from);
+
+    console.log(items);
+
+    return PageResponse.from(items, Number(totalElements), pageAble);
   }
 
   async updateQuiz(id: bigint, updateQuizRequestDto: UpdateQuizRequestDto) {
