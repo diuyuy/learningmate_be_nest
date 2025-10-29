@@ -118,7 +118,8 @@ export class ArticleController {
   @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
   @ApiQuery({
     name: 'sort',
-    description: '정렬 옵션 (createdAt, updatedAt, likeCounts)',
+    description:
+      '정렬 옵션 (createdAt, updatedAt, likeCounts). 정렬 예시 ("createdAt,desc")',
     required: false,
   })
   @ApiResponseDecorator({

@@ -295,7 +295,7 @@ export class MemberController {
   })
   @ApiQuery({
     name: 'sort',
-    description: '정렬 옵션 (예: createdAt,desc). 가능한 정렬 속성: createdAt',
+    description: '정렬 옵션 ("createdAt"). 정렬 예시 ("createdAt,desc")',
     example: 'createdAt,desc',
     required: false,
   })
@@ -371,7 +371,7 @@ export class MemberController {
   })
   @ApiQuery({
     name: 'sort',
-    description: '정렬 옵션 (예: createdAt,desc)',
+    description: '정렬 옵션 (예: createdAt,desc). 정렬 예시 ("createdAt,desc")',
     example: 'createdAt,desc',
     required: false,
   })

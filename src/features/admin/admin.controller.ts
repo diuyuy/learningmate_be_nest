@@ -60,7 +60,7 @@ export class AdminController {
   @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
   @ApiQuery({
     name: 'sort',
-    description: '정렬 옵션 ("id", "name")',
+    description: '정렬 옵션 ("id", "name"). 정렬 예시 ("createdAt,desc")',
     type: String,
     required: false,
   })
