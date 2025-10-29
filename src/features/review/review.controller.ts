@@ -90,7 +90,7 @@ export class ReviewController {
   @ApiQuery({
     name: 'sort',
     description: '정렬 옵션 (createdAt, updatedAt, likeCounts)',
-    type: Number,
+    type: String,
     example: 'createdAt,desc',
   })
   @ApiResponseDecorator({
