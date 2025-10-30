@@ -95,8 +95,6 @@ export class AuthService {
   async validateUser(email: string, passwd: string) {
     const member = await this.memberService.findByEmail(email);
 
-    console.log(member);
-
     if (!member || !member.passwordHash) return null;
 
     return (await bcrypt.compare(passwd, member.passwordHash)) ? member : null;

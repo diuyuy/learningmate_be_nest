@@ -9,6 +9,13 @@ export type IncorrectQuizQueryResult = {
   answerCreatedAt: Date;
   articleId: bigint;
   title: string;
+  question1: string;
+  question2: string;
+  question3: string;
+  question4: string;
+  keywordId: bigint;
+  keywordName: string;
+  keywordDescription: string;
 };
 
 export class IncorrectQuizResponseDto {
@@ -17,11 +24,25 @@ export class IncorrectQuizResponseDto {
 
   @ApiProperty({
     description: '관련 기사 정보',
-    example: { id: 1, title: '경제 뉴스 제목' },
+    example: {
+      id: 1,
+      title: '1인당 국민소득의 개념',
+      keyword: {
+        id: 1,
+        name: '1인당 국민소득',
+        description:
+          '국민소득을 총국민 수로 나눈 값. 해당 국가의 소득 수준을 보여주는 가장 대표적인 지표이다.',
+      },
+    },
   })
   article: {
     id: bigint;
     title: string;
+    keyword: {
+      id: bigint;
+      name: string;
+      description: string;
+    };
   };
 
   @ApiProperty({ description: '퀴즈 문제', example: '이 경제 용어의 의미는?' })
@@ -33,10 +54,10 @@ export class IncorrectQuizResponseDto {
   })
   explanation: string;
 
-  @ApiProperty({ description: '정답', example: '인플레이션' })
+  @ApiProperty({ description: '정답', example: '1' })
   answer: string;
 
-  @ApiProperty({ description: '사용자가 제출한 오답', example: '디플레이션' })
+  @ApiProperty({ description: '사용자가 제출한 오답', example: '2' })
   memberAnswer: string;
 
   @ApiProperty({
@@ -44,6 +65,18 @@ export class IncorrectQuizResponseDto {
     example: '2025-01-15T10:30:00Z',
   })
   answerCreatedAt: Date;
+
+  @ApiProperty({ description: '퀴즈 선택지 1' })
+  question1: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 2' })
+  question2: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 3' })
+  question3: string;
+
+  @ApiProperty({ description: '퀴즈 선택지 4' })
+  question4: string;
 
   constructor({
     id,
@@ -53,6 +86,10 @@ export class IncorrectQuizResponseDto {
     answer,
     memberAnswer,
     answerCreatedAt,
+    question1,
+    question2,
+    question3,
+    question4,
   }: IncorrectQuizResponseDto) {
     this.id = id;
     this.article = article;
@@ -61,6 +98,10 @@ export class IncorrectQuizResponseDto {
     this.answer = answer;
     this.memberAnswer = memberAnswer;
     this.answerCreatedAt = answerCreatedAt;
+    this.question1 = question1;
+    this.question2 = question2;
+    this.question3 = question3;
+    this.question4 = question4;
   }
 
   static from(
@@ -74,6 +115,13 @@ export class IncorrectQuizResponseDto {
       articleId,
       title,
       answerCreatedAt,
+      question1,
+      question2,
+      question3,
+      question4,
+      keywordId,
+      keywordName,
+      keywordDescription,
     }: IncorrectQuizQueryResult,
   ) {
     return new IncorrectQuizResponseDto({
@@ -86,7 +134,16 @@ export class IncorrectQuizResponseDto {
       article: {
         id: articleId,
         title,
+        keyword: {
+          id: keywordId,
+          name: keywordName,
+          description: keywordDescription,
+        },
       },
+      question1,
+      question2,
+      question3,
+      question4,
     });
   }
 }

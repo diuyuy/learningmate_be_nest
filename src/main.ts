@@ -16,7 +16,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  console.log(process.env.CORS_ORIGIN);
   app.setGlobalPrefix('/api');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());

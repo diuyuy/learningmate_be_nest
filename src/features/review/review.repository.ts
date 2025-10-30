@@ -3,11 +3,8 @@ import { PageResponse } from 'src/core/api-response/page-response';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { Pageable, ReviewSortOption } from '../../core/types/types';
-import {
-  PageReviewCountResponseDto,
-  PageReviewResponseDto,
-  ReviewCreateRequestDto,
-} from './dto';
+import { PageReviewCountResponseDto, ReviewCreateRequestDto } from './dto';
+import { PageMyReviewResponseDto } from './dto/page-my-review-response.dto';
 
 @Injectable()
 export class ReviewRepository {
@@ -131,6 +128,11 @@ export class ReviewRepository {
             title: true,
           },
         },
+        _count: {
+          select: {
+            likeReview: true,
+          },
+        },
       },
       where: {
         memberId,
@@ -146,16 +148,7 @@ export class ReviewRepository {
       },
     });
 
-    const pageReviews = reviews.map(
-      ({ id, createdAt, content1, article, member }) =>
-        new PageReviewResponseDto({
-          id,
-          createdAt,
-          content1,
-          title: article.title,
-          nickname: member.nickname,
-        }),
-    );
+    const pageReviews = reviews.map(PageMyReviewResponseDto.from);
 
     return PageResponse.from(pageReviews, totalElements, pageAble);
   }
@@ -257,7 +250,6 @@ export class ReviewRepository {
   }
 
   async likeReview(memberId: bigint, reviewId: bigint) {
-    console.log('>>>>>');
     await this.prismaService.likeReview.upsert({
       where: {
         reviewId_memberId: {

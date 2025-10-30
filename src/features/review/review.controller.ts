@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiExtraModels,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -20,6 +21,7 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import { ApiResponse } from 'src/core/api-response/api-response';
+import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
@@ -30,9 +32,11 @@ import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption, ReviewSortOption } from 'src/core/types/types';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import { PageReviewCountResponseDto, ReviewUpdateRequestDto } from './dto';
+import { PageMyReviewResponseDto } from './dto/page-my-review-response.dto';
 import { ReviewService } from './review.service';
 
 @ApiTags('Review')
+@ApiExtraModels(PageMyReviewResponseDto)
 @Controller('v1/reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
@@ -102,8 +106,19 @@ export class ReviewController {
         {
           properties: {
             result: {
-              type: 'array',
-              items: { $ref: getSchemaPath(PageReviewCountResponseDto) },
+              allOf: [
+                { $ref: getSchemaPath(PageResponse) },
+                {
+                  properties: {
+                    items: {
+                      type: 'array',
+                      items: {
+                        $ref: getSchemaPath(PageMyReviewResponseDto),
+                      },
+                    },
+                  },
+                },
+              ],
             },
           },
         },
