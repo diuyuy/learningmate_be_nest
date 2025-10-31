@@ -74,8 +74,13 @@ export class ArticleController {
     },
   })
   @Get(':id')
-  async findById(@Param('id', ParseBigIntPipe) id: bigint) {
-    const article = await this.articleService.findById(id);
+  async findById(
+    @Param('id', ParseBigIntPipe) id: bigint,
+    @Req() req: RequestWithUser,
+  ) {
+    const memberId = BigInt(req.user.id);
+
+    const article = await this.articleService.findById(id, memberId);
 
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),

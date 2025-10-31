@@ -26,8 +26,26 @@ export class ArticleRepository {
     });
   }
 
-  async findById(id: bigint) {
+  async findById(id: bigint, memberId: bigint) {
     return this.prismaService.article.findUnique({
+      select: {
+        id: true,
+        content: true,
+        publishedAt: true,
+        keywordId: true,
+        scrapCount: true,
+        summary: true,
+        title: true,
+        views: true,
+        ArticleScrap: {
+          select: {
+            id: true,
+          },
+          where: {
+            memberId,
+          },
+        },
+      },
       where: {
         id,
       },
@@ -58,7 +76,7 @@ export class ArticleRepository {
     ]);
 
     const articles = articleScraps.map(({ article }) =>
-      ArticleResponseDto.from(article),
+      ArticleResponseDto.from({ ...article, scrappedByMe: true }),
     );
 
     return PageResponse.from(articles, totalElements, pageAble);

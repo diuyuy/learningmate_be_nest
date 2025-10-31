@@ -70,6 +70,7 @@ describe('ArticleRepository', () => {
   describe('findById', () => {
     it('should return article by id', async () => {
       const articleId = BigInt(1);
+      const memberId = BigInt(1);
       const expectedArticle = {
         id: BigInt(1),
         title: 'Test Article',
@@ -79,14 +80,35 @@ describe('ArticleRepository', () => {
         scrapCount: BigInt(5),
         views: BigInt(100),
         keywordId: BigInt(1),
+        ArticleSrap: {
+          memberId: 1,
+        },
       };
 
       mockPrisma.article.findUnique.mockResolvedValue(expectedArticle as any);
 
-      const result = await repository.findById(articleId);
+      const result = await repository.findById(articleId, memberId);
 
       expect(result).toEqual(expectedArticle);
       expect(mockPrisma.article.findUnique).toHaveBeenCalledWith({
+        select: {
+          id: true,
+          content: true,
+          publishedAt: true,
+          keywordId: true,
+          scrapCount: true,
+          summary: true,
+          title: true,
+          views: true,
+          ArticleScrap: {
+            select: {
+              id: true,
+            },
+            where: {
+              memberId,
+            },
+          },
+        },
         where: {
           id: articleId,
         },
@@ -96,13 +118,32 @@ describe('ArticleRepository', () => {
 
     it('should return null when article not found', async () => {
       const articleId = BigInt(999);
+      const memberId = BigInt(1);
 
       mockPrisma.article.findUnique.mockResolvedValue(null);
 
-      const result = await repository.findById(articleId);
+      const result = await repository.findById(articleId, memberId);
 
       expect(result).toBeNull();
       expect(mockPrisma.article.findUnique).toHaveBeenCalledWith({
+        select: {
+          id: true,
+          content: true,
+          publishedAt: true,
+          keywordId: true,
+          scrapCount: true,
+          summary: true,
+          title: true,
+          views: true,
+          ArticleScrap: {
+            select: {
+              id: true,
+            },
+            where: {
+              memberId,
+            },
+          },
+        },
         where: {
           id: articleId,
         },

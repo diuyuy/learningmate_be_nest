@@ -94,6 +94,7 @@ describe('ArticleService', () => {
   describe('findById', () => {
     it('should return article when found', async () => {
       const articleId = BigInt(1);
+      const memberId = BigInt(1);
       const mockArticle = {
         id: BigInt(1),
         title: 'Test Article',
@@ -105,11 +106,12 @@ describe('ArticleService', () => {
         keywordId: BigInt(1),
         createdAt: new Date('2025-01-01'),
         updatedAt: new Date('2025-01-01'),
+        ArticleScrap: [{ id: BigInt(1) }],
       };
 
       repository.findById.mockResolvedValue(mockArticle);
 
-      const result = await service.findById(articleId);
+      const result = await service.findById(articleId, memberId);
 
       expect(result).toEqual({
         id: BigInt(1),
@@ -128,15 +130,16 @@ describe('ArticleService', () => {
 
     it('should throw CommonException when article not found', async () => {
       const articleId = BigInt(999);
+      const memberId = BigInt(1);
 
       repository.findById.mockResolvedValue(null);
 
-      await expect(service.findById(articleId)).rejects.toThrow(
+      await expect(service.findById(articleId, memberId)).rejects.toThrow(
         CommonException,
       );
 
       try {
-        await service.findById(articleId);
+        await service.findById(articleId, memberId);
       } catch (error) {
         expect(error).toBeInstanceOf(CommonException);
         expect(error.getResponse()).toMatchObject({
@@ -145,7 +148,7 @@ describe('ArticleService', () => {
         });
       }
 
-      expect(repository.findById).toHaveBeenCalledWith(articleId);
+      expect(repository.findById).toHaveBeenCalledWith(articleId, memberId);
     });
   });
 

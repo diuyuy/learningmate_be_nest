@@ -22,15 +22,20 @@ export class ArticleService {
     return articleList.map(ArticlePreviewResponseDto.from);
   }
 
-  async findById(id: bigint): Promise<ArticleResponseDto> {
-    const article = await this.articleRepository.findById(id);
+  async findById(id: bigint, memberId: bigint): Promise<ArticleResponseDto> {
+    const article = await this.articleRepository.findById(id, memberId);
 
     if (!article)
       throw new CommonException(
         ResponseStatusFactory.create(ResponseCode.ARTICLE_NOT_FOUND),
       );
 
-    return ArticleResponseDto.from(article);
+    const { ArticleScrap, ...rest } = article;
+
+    return ArticleResponseDto.from({
+      ...rest,
+      scrappedByMe: ArticleScrap.length > 0,
+    });
   }
 
   async findArticleScraps(

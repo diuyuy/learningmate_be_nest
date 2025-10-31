@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Article } from 'generated/prisma';
 
 export class ArticleResponseDto {
   @ApiProperty({ description: '기사 ID', type: Number })
@@ -26,6 +25,9 @@ export class ArticleResponseDto {
   @ApiProperty({ description: '키워드 ID', type: Number })
   keywordId: bigint;
 
+  @ApiProperty({ description: '사용자가 스크랩 했는지 여부', type: Boolean })
+  scrappedByMe?: boolean;
+
   constructor({
     id,
     title,
@@ -35,6 +37,7 @@ export class ArticleResponseDto {
     scrapCount,
     summary,
     views,
+    scrappedByMe,
   }: ArticleResponseDto) {
     this.id = id;
     this.content = content;
@@ -44,9 +47,10 @@ export class ArticleResponseDto {
     this.summary = summary;
     this.title = title;
     this.views = views;
+    this.scrappedByMe = scrappedByMe;
   }
 
-  static from(this: void, article: Article): ArticleResponseDto {
+  static from(this: void, article: ArticleResponseDto): ArticleResponseDto {
     return new ArticleResponseDto(article);
   }
 }
