@@ -11,10 +11,6 @@ import { MemberResponseDto } from './features/member/dto/member-response.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  });
 
   app.setGlobalPrefix('/api');
   app.use(cookieParser());
@@ -22,6 +18,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggingInterceptor(), new BigIntInterceptor());
 
   if (process.env.NODE_ENV !== 'production') {
+    app.enableCors({
+      origin: process.env.CORS_ORIGIN,
+      credentials: true,
+    });
+
     const config = new DocumentBuilder()
       .setTitle('Learningmate API Documentation')
       .setDescription('The Learningmate API description')

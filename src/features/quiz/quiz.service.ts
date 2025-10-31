@@ -50,10 +50,16 @@ export class QuizService {
     const [incorrectQuizzes, [{ counts: totalElements }]] = await Promise.all([
       this.prismaService.$queryRaw<
         IncorrectQuizQueryResult[]
-      >`SELECT q.id, q.description, q.explanation, q.articleId, q.answer, q.question1, q.question2, q.question3, q.question4,mq.createdAt AS answerCreatedAt, mq.memberAnswer, a.title, k.id as keywordId, k.name as keywordName, k.description as keywordDescription FROM MemberQuiz AS mq
+      >`SELECT q.id, q.description, q.explanation, q.articleId, q.answer,
+      q.question1, q.question2, q.question3, q.question4,
+      mq.createdAt AS answerCreatedAt, mq.memberAnswer,
+      a.title, k.id as keywordId, k.name as keywordName,
+      k.description as keywordDescription, tk.date
+      FROM MemberQuiz AS mq
       INNER JOIN Quiz AS q ON q.id = mq.quizId
       INNER JOIN Article AS a ON a.id = q.articleId
       INNER JOIN Keyword AS k ON a.keywordId = k.id
+      INNER JOIN TodaysKeyword AS tk ON tk.keywordId = k.id
       WHERE mq.memberId = ${memberId} and mq.memberAnswer <> q.answer
       ${orderByClause}
       LIMIT ${pageAble.size}

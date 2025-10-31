@@ -16,6 +16,7 @@ export type IncorrectQuizQueryResult = {
   keywordId: bigint;
   keywordName: string;
   keywordDescription: string;
+  date: Date;
 };
 
 export class IncorrectQuizResponseDto {
@@ -32,6 +33,7 @@ export class IncorrectQuizResponseDto {
         name: '1인당 국민소득',
         description:
           '국민소득을 총국민 수로 나눈 값. 해당 국가의 소득 수준을 보여주는 가장 대표적인 지표이다.',
+        date: '2025-10-20 12:33:32.149064',
       },
     },
   })
@@ -42,6 +44,7 @@ export class IncorrectQuizResponseDto {
       id: bigint;
       name: string;
       description: string;
+      date: Date;
     };
   };
 
@@ -122,6 +125,7 @@ export class IncorrectQuizResponseDto {
       keywordId,
       keywordName,
       keywordDescription,
+      date,
     }: IncorrectQuizQueryResult,
   ) {
     return new IncorrectQuizResponseDto({
@@ -138,6 +142,7 @@ export class IncorrectQuizResponseDto {
           id: keywordId,
           name: keywordName,
           description: keywordDescription,
+          date,
         },
       },
       question1,
