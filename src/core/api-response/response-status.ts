@@ -47,6 +47,7 @@ export enum ResponseCode {
   EMAIL_NOT_FOUND = 'EMAIL_NOT_FOUND',
   CATEGORY_NOT_FOUND = 'CATEGORY_NOT_FOUND',
   TERM_NOT_FOUND = 'TERM_NOT_FOUND',
+  JOB_NOT_FOUND = 'JOB_NOT_FOUND',
 
   // 409 Conflict
   DUPLICATE_REVIEW = 'DUPLICATE_REVIEW',
@@ -57,6 +58,7 @@ export enum ResponseCode {
   LOAD_IMAGE_FAIL = 'LOAD_IMAGE_FAIL',
   SAVE_IMAGE_FAIL = 'SAVE_IMAGE_FAIL',
   DELETE_IMAGE_FAIL = 'DELETE_IMAGE_FAIL',
+  CREATE_JOB_FAIL = 'CREATE_JOB_FAIL',
 }
 
 export class ResponseStatus {
@@ -240,6 +242,10 @@ export class ResponseStatusFactory {
       status: HttpStatus.NOT_FOUND,
       message: '존재하지 않는 용어 입니다.',
     },
+    [ResponseCode.JOB_NOT_FOUND]: {
+      status: HttpStatus.NOT_FOUND,
+      message: '존재하지 않는 배치 작업입니다.',
+    },
 
     // 409 Conflict
     [ResponseCode.DUPLICATE_REVIEW]: {
@@ -267,6 +273,10 @@ export class ResponseStatusFactory {
     [ResponseCode.DELETE_IMAGE_FAIL]: {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       message: '이미지 삭제를 실패했습니다.',
+    },
+    [ResponseCode.CREATE_JOB_FAIL]: {
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: '배치 작업 생성을 실패했습니다.',
     },
   } as const;
 

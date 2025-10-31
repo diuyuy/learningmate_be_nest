@@ -40,6 +40,7 @@ import type {
 } from '../../core/types/types';
 import { ArticleService } from '../article/article.service';
 import { ArticleResponseDto } from '../article/dto/article-response.dto';
+import { ScrappedArticleResponseDto } from '../article/dto/scrapped-article-response.dto';
 import type { RequestWithUser } from '../auth/types/request-with-user';
 import { IncorrectQuizResponseDto } from '../quiz/dto/incorrect-quiz-response.dto';
 import { QuizService } from '../quiz/quiz.service';
@@ -63,6 +64,7 @@ import { MemberService } from './member.service';
   MemberResponseDto,
   QuizStatsResponseDto,
   IncorrectQuizResponseDto,
+  ScrappedArticleResponseDto,
 )
 @Controller('v1/members')
 export class MemberController {
@@ -390,7 +392,9 @@ export class MemberController {
                   properties: {
                     items: {
                       type: 'array',
-                      items: { $ref: getSchemaPath(ArticleResponseDto) },
+                      items: {
+                        $ref: getSchemaPath(ScrappedArticleResponseDto),
+                      },
                     },
                   },
                 },
@@ -416,7 +420,7 @@ export class MemberController {
     sortOption: PageSortOption<ArticleScrapSortOption>,
     @Req()
     req: RequestWithUser,
-  ): Promise<ApiResponse<PageResponse<ArticleResponseDto>>> {
+  ): Promise<ApiResponse<PageResponse<ScrappedArticleResponseDto>>> {
     const memberId = BigInt(req.user.id);
 
     const pageArticles = await this.articleService.findArticleScraps(memberId, {

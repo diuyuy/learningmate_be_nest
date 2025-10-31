@@ -4,6 +4,7 @@ import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.serv
 import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleResponseDto } from './dto/article-response.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { ScrappedArticleResponseDto } from './dto/scrapped-article-response.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
@@ -59,7 +60,29 @@ export class ArticleRepository {
     const [articleScraps, totalElements] = await Promise.all([
       this.prismaService.articleScrap.findMany({
         select: {
-          article: true,
+          article: {
+            select: {
+              id: true,
+              content: true,
+              publishedAt: true,
+              summary: true,
+              title: true,
+              scrapCount: true,
+              views: true,
+              keyword: {
+                select: {
+                  id: true,
+                  description: true,
+                  name: true,
+                  todaysKeyword: {
+                    select: {
+                      date: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           memberId,
@@ -76,17 +99,24 @@ export class ArticleRepository {
     ]);
 
     const articles = articleScraps.map(({ article }) =>
-      ArticleResponseDto.from({ ...article, scrappedByMe: true }),
+      ScrappedArticleResponseDto.from({ ...article, scrappedByMe: true }),
     );
 
     return PageResponse.from(articles, totalElements, pageAble);
   }
 
   async scrapArticle(memberId: bigint, articleId: bigint) {
-    await this.prismaService.articleScrap.create({
-      data: {
-        memberId,
+    await this.prismaService.articleScrap.upsert({
+      create: {
         articleId,
+        memberId,
+      },
+      update: {},
+      where: {
+        memberId_articleId: {
+          memberId,
+          articleId,
+        },
       },
     });
   }
