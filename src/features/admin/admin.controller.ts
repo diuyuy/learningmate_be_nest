@@ -28,7 +28,6 @@ import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption } from 'src/core/types/types';
 import { KeywordSortOption } from 'src/core/types/types';
 import { ArticleResponseDto } from '../article/dto/article-response.dto';
-import { CreateArticleDto } from '../article/dto/create-article.dto';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { Roles } from '../auth/decorators/roles';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -39,6 +38,8 @@ import { CreateVideoRequestDto } from '../video/dto/create-video-request.dto';
 import { UpdateVideoRequestDto } from '../video/dto/update-video-request.dto';
 import { VideoResponseDto } from '../video/dto/video-response.dto';
 import { AdminService } from './admin.service';
+import { BatchJobResponseDto } from './dto/batch-job-response.dto';
+import { BatchJobStateResponseDto } from './dto/batch-job-state-response.dto';
 
 @ApiTags('Admin')
 @ApiExtraModels(
@@ -46,6 +47,8 @@ import { AdminService } from './admin.service';
   VideoResponseDto,
   ArticleResponseDto,
   QuizResponseDto,
+  BatchJobResponseDto,
+  BatchJobStateResponseDto,
 )
 @Roles(['admin'])
 @UseGuards(RoleGuard)
@@ -55,6 +58,12 @@ export class AdminController {
 
   @ApiOperation({
     summary: '키워드 페이지네이션 조회',
+  })
+  @ApiQuery({
+    name: 'query',
+    description: '페이지 번호',
+    type: String,
+    required: false,
   })
   @ApiQuery({ name: 'page', description: '페이지 번호', type: Number })
   @ApiQuery({ name: 'size', description: '페이지 크기', type: Number })
@@ -98,12 +107,13 @@ export class AdminController {
   })
   @Get('keywords')
   async findKeywords(
+    @Query('query') query: string = '',
     @Query('page', ParseNonNegativeIntPipe) page: number,
     @Query('size', ParseNonNegativeIntPipe) size: number,
     @Query('sort', new ParsePageSortPipe<KeywordSortOption>(['id', 'name']))
     sortOptions: PageSortOption<KeywordSortOption>,
   ) {
-    const keywords = await this.adminService.findKeywords({
+    const keywords = await this.adminService.findKeywords(query, {
       page,
       size,
       ...sortOptions,
@@ -148,6 +158,37 @@ export class AdminController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       quizzes,
+    );
+  }
+
+  @ApiOperation({
+    summary: '배치 작업 상태 조회',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '배치 작업 상태 조회 성공',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponse),
+        },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(BatchJobStateResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Get('batch-jobs/:jobId')
+  async getBatchJobState(@Param('jobId') jobId: string) {
+    const jobState = await this.adminService.getBatchJobState(jobId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      jobState,
     );
   }
 
@@ -239,7 +280,7 @@ export class AdminController {
         {
           properties: {
             result: {
-              $ref: getSchemaPath(ArticleResponseDto),
+              $ref: getSchemaPath(BatchJobResponseDto),
             },
           },
         },
@@ -249,16 +290,12 @@ export class AdminController {
   @Post('keywords/:keywordId/articles')
   async createArtileOfKeyword(
     @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
-    @Body() createArticleDto: CreateArticleDto,
   ) {
-    const article = await this.adminService.createArticle(
-      keywordId,
-      createArticleDto,
-    );
+    const job = await this.adminService.createArticle(keywordId);
 
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.CREATED),
-      article,
+      job,
     );
   }
 

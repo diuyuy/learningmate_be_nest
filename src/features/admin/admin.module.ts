@@ -11,6 +11,7 @@ import { QuizModule } from '../quiz/quiz.module';
 import { VideoModule } from '../video/video.module';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { BatchService } from './batch.service';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { AdminService } from './admin.service';
     }),
   ],
   controllers: [AdminController],
-  providers: [AdminService],
+  providers: [AdminService, BatchService],
 })
 export class AdminModule {}

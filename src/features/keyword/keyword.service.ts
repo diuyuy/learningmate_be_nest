@@ -47,7 +47,7 @@ export class KeywordService {
     return KeywordResponseDto.from(keyword);
   }
 
-  async findKeywords(pageAble: Pageable<KeywordSortOption>) {
+  async findKeywords(query: string, pageAble: Pageable<KeywordSortOption>) {
     const [keywords, totalElements] = await Promise.all([
       this.prismaService.keyword.findMany({
         select: {
@@ -67,13 +67,29 @@ export class KeywordService {
             },
           },
         },
+        where:
+          query !== ''
+            ? {
+                name: {
+                  search: query,
+                },
+              }
+            : undefined,
         skip: pageAble.page * pageAble.size,
         take: pageAble.size,
         orderBy: {
           [pageAble.sortProp]: pageAble.sortDirection,
         },
       }),
-      this.prismaService.keyword.count(),
+      query === ''
+        ? this.prismaService.keyword.count()
+        : this.prismaService.keyword.count({
+            where: {
+              name: {
+                search: query,
+              },
+            },
+          }),
     ]);
 
     const items = keywords.map(KeywordDetailResponseDto.from);
