@@ -23,6 +23,7 @@ import {
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
 import { ParseBigIntPipe } from 'src/core/pipes/parse-bigint-pipe';
+import { ParseCategoryPipe } from 'src/core/pipes/parse-category-pipe';
 import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pipe';
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption } from 'src/core/types/types';
@@ -31,6 +32,7 @@ import { ArticleResponseDto } from '../article/dto/article-response.dto';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { Roles } from '../auth/decorators/roles';
 import { RoleGuard } from '../auth/guards/role.guard';
+import { UpdateKeywordDto } from '../keyword/dto';
 import { KeywordDetailResponseDto } from '../keyword/dto/keyword-detail-response.dto';
 import { QuizResponseDto } from '../quiz/dto/quiz-response.dto';
 import { UpdateQuizRequestDto } from '../quiz/dto/update-quiz-request.dto';
@@ -61,7 +63,13 @@ export class AdminController {
   })
   @ApiQuery({
     name: 'query',
-    description: '페이지 번호',
+    description: '키워드 검색어',
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'category',
+    description: '키워드 카테고리',
     type: String,
     required: false,
   })
@@ -108,12 +116,13 @@ export class AdminController {
   @Get('keywords')
   async findKeywords(
     @Query('query') query: string = '',
+    @Query('category', ParseCategoryPipe) category: string,
     @Query('page', ParseNonNegativeIntPipe) page: number,
     @Query('size', ParseNonNegativeIntPipe) size: number,
     @Query('sort', new ParsePageSortPipe<KeywordSortOption>(['id', 'name']))
     sortOptions: PageSortOption<KeywordSortOption>,
   ) {
-    const keywords = await this.adminService.findKeywords(query, {
+    const keywords = await this.adminService.findKeywords(query, category, {
       page,
       size,
       ...sortOptions,
@@ -158,6 +167,43 @@ export class AdminController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       quizzes,
+    );
+  }
+
+  @ApiOperation({
+    summary: '키워드 수정',
+  })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '키워드 수정 성공',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponse),
+        },
+        {
+          properties: {
+            result: {
+              $ref: getSchemaPath(KeywordDetailResponseDto),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Patch('keywords/:keywordId')
+  async updateKeyword(
+    @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
+    @Body() updateKeywordDto: UpdateKeywordDto,
+  ) {
+    const keyword = await this.adminService.updateKeyword(
+      keywordId,
+      updateKeywordDto,
+    );
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      keyword,
     );
   }
 

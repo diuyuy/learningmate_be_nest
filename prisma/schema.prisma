@@ -65,6 +65,7 @@ model Keyword {
   video         Video[]
 
   @@index([categoryId], map: "FK9hqhtlqxtjb70umrxcvvb1qvc")
+  @@index([name], map: "idx_keyword_name")
   @@fulltext([name], map: "ft_keyword_name")
 }
 

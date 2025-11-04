@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { KeywordSortOption, Pageable } from 'src/core/types/types';
 import { ArticleService } from '../article/article.service';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
+import { UpdateKeywordDto } from '../keyword/dto';
 import { KeywordService } from '../keyword/keyword.service';
 import { UpdateQuizRequestDto } from '../quiz/dto/update-quiz-request.dto';
 import { QuizService } from '../quiz/quiz.service';
@@ -18,12 +19,20 @@ export class AdminService {
     private readonly batchService: BatchService,
   ) {}
 
-  async findKeywords(query: string, pageAble: Pageable<KeywordSortOption>) {
-    return this.keywordService.findKeywords(query, pageAble);
+  async findKeywords(
+    query: string,
+    category: string,
+    pageAble: Pageable<KeywordSortOption>,
+  ) {
+    return this.keywordService.findKeywords(query, category, pageAble);
   }
 
   async findQuizzes(articleId: bigint) {
     return this.quizService.findQuizDetailsByArticleId(articleId);
+  }
+
+  async updateKeyword(keywordId: bigint, updateKeywordDto: UpdateKeywordDto) {
+    return this.keywordService.updateKeyword(keywordId, updateKeywordDto);
   }
 
   async getBatchJobState(jobId: string) {

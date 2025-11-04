@@ -373,7 +373,8 @@ export class MemberController {
   })
   @ApiQuery({
     name: 'sort',
-    description: '정렬 옵션 (예: createdAt,desc). 정렬 예시 ("createdAt,desc")',
+    description:
+      '정렬 옵션 (createdAt, scrapCounts). 정렬 예시 ("createdAt,desc")',
     example: 'createdAt,desc',
     required: false,
   })

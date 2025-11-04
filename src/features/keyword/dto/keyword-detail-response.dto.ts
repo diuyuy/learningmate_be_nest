@@ -1,7 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import type { Category, Video } from 'generated/prisma';
 import { VideoResponseDto } from 'src/features/video/dto/video-response.dto';
 import { CategoryResponseDto } from './category-response.dto';
+
+type KeywordFromPrisma = {
+  id: bigint;
+  description: string;
+  name: string;
+  category: {
+    id: bigint;
+    name: string;
+  };
+  todaysKeyword: {
+    date: Date;
+  }[];
+  video: {
+    id: bigint;
+    link: string;
+  }[];
+};
 
 export class KeywordDetailResponseDto {
   @ApiProperty({
@@ -36,18 +52,23 @@ export class KeywordDetailResponseDto {
   })
   name: string;
 
+  @ApiProperty({ description: '날짜' })
+  date: Date;
+
   constructor({
     id,
     category,
     description,
     name,
     video,
+    date,
   }: KeywordDetailResponseDto) {
     this.id = id;
     this.category = category;
     this.description = description;
     this.name = name;
     this.video = video;
+    this.date = date;
   }
 
   static from(
@@ -58,17 +79,13 @@ export class KeywordDetailResponseDto {
       video,
       description,
       name,
-    }: {
-      id: bigint;
-      category: Category;
-      video: Video[];
-      description: string;
-      name: string;
-    },
+      todaysKeyword,
+    }: KeywordFromPrisma,
   ) {
     return new KeywordDetailResponseDto({
       id,
       category,
+      date: todaysKeyword[0]?.date ?? null,
       description,
       name,
       video: video[0] ?? null,

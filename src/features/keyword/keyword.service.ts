@@ -7,7 +7,11 @@ import {
 import { CommonException } from 'src/core/exception/common-exception';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { KeywordSortOption, Pageable } from 'src/core/types/types';
-import { KeywordResponseDto, TodaysKeywordResponseDto } from './dto';
+import {
+  KeywordResponseDto,
+  TodaysKeywordResponseDto,
+  UpdateKeywordDto,
+} from './dto';
 import { KeywordDetailResponseDto } from './dto/keyword-detail-response.dto';
 
 @Injectable()
@@ -47,53 +51,119 @@ export class KeywordService {
     return KeywordResponseDto.from(keyword);
   }
 
-  async findKeywords(query: string, pageAble: Pageable<KeywordSortOption>) {
+  async findKeywords(
+    query: string,
+    category: string,
+    pageAble: Pageable<KeywordSortOption>,
+  ) {
+    const whereCondition = this.getFindKeywordCondition(query, category);
+
     const [keywords, totalElements] = await Promise.all([
       this.prismaService.keyword.findMany({
-        select: {
-          id: true,
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          description: true,
-          name: true,
-          video: {
-            select: {
-              id: true,
-              link: true,
-            },
-          },
-        },
-        where:
-          query !== ''
-            ? {
-                name: {
-                  search: query,
-                },
-              }
-            : undefined,
+        select: this.selectKeywordDetail(),
+        where: whereCondition,
         skip: pageAble.page * pageAble.size,
         take: pageAble.size,
         orderBy: {
           [pageAble.sortProp]: pageAble.sortDirection,
         },
       }),
-      query === ''
-        ? this.prismaService.keyword.count()
-        : this.prismaService.keyword.count({
-            where: {
-              name: {
-                search: query,
-              },
-            },
-          }),
+      this.prismaService.keyword.count({
+        where: whereCondition,
+      }),
     ]);
 
     const items = keywords.map(KeywordDetailResponseDto.from);
 
     return PageResponse.from(items, totalElements, pageAble);
+  }
+
+  async updateKeyword(
+    keywordId: bigint,
+    { categoryName, ...rest }: UpdateKeywordDto,
+  ) {
+    const category = await this.prismaService.category.findFirst({
+      select: {
+        id: true,
+      },
+      where: {
+        name: categoryName,
+      },
+    });
+
+    if (!category) {
+      throw new CommonException(
+        ResponseStatusFactory.create(ResponseCode.CATEGORY_NOT_FOUND),
+      );
+    }
+
+    const keyword = await this.prismaService.keyword.update({
+      data: {
+        category: {
+          update: {
+            data: {
+              id: category.id,
+            },
+          },
+        },
+        ...rest,
+      },
+      where: {
+        id: keywordId,
+      },
+      select: this.selectKeywordDetail(),
+    });
+
+    return KeywordDetailResponseDto.from(keyword);
+  }
+
+  private selectKeywordDetail() {
+    return {
+      id: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      description: true,
+      name: true,
+      todaysKeyword: {
+        select: {
+          date: true,
+        },
+      },
+      video: {
+        select: {
+          id: true,
+          link: true,
+        },
+      },
+    };
+  }
+
+  private getFindKeywordCondition(query: string, category: string) {
+    if (query === '') {
+      return category !== 'all'
+        ? {
+            category: {
+              name: category,
+            },
+          }
+        : undefined;
+    }
+
+    const searchCondition = {
+      OR: [
+        { name: { search: query } }, // fulltext search (단어 기반)
+        { name: { startsWith: query } }, // LIKE 'query%' (접두사 검색)
+      ],
+    };
+
+    return category === 'all'
+      ? searchCondition
+      : {
+          AND: [searchCondition, { category: { name: category } }],
+        };
   }
 }
