@@ -51,10 +51,10 @@ export class MemberService {
 
   async updateMember(
     id: bigint,
-    memberUpdateRequestDto: MemberUpdateRequestDto,
+    { password, ...rest }: MemberUpdateRequestDto,
   ) {
     const member = await this.prismaService.member.update({
-      data: memberUpdateRequestDto,
+      data: { passwordHash: password, ...rest },
       where: {
         id,
       },
@@ -126,6 +126,8 @@ export class MemberService {
       );
     }
 
+    const deletedAt = new Date();
+
     await Promise.all([
       this.prismaService.member.update({
         data: {
@@ -133,7 +135,7 @@ export class MemberService {
           nickname: null,
           passwordHash: null,
           imageUrl: null,
-          deletedAt: `${Date.now()}`,
+          deletedAt: `${deletedAt.toISOString()}`,
         },
         where: {
           id,

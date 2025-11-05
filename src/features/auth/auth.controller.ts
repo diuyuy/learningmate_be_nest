@@ -321,7 +321,7 @@ export class AuthController {
       },
     },
   })
-  @Post('passwd-resets')
+  @Post('password-resets')
   async sendPasswdResetMail(
     @Body() sendResetPasswdRequestDto: SendResetPasswdRequestDto,
   ) {
@@ -348,7 +348,7 @@ export class AuthController {
       },
     },
   })
-  @Patch()
+  @Patch('password-resets')
   async resetPasswd(@Body() passwdResetRequestDto: PasswdResetRequestDto) {
     await this.authService.resetPassword(passwdResetRequestDto);
 
