@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CookieModule } from 'src/core/infrastructure/cookie/cookie.module';
 import { PrismaModule } from 'src/core/infrastructure/prisma-module/prisma.module';
 import { S3Module } from 'src/core/infrastructure/s3/s3.module';
 import { ArticleModule } from '../article/article.module';
@@ -18,6 +19,7 @@ import { MemberService } from './member.service';
     StatisticModule,
     ArticleModule,
     QuizModule,
+    CookieModule,
   ],
   controllers: [MemberController],
   providers: [MemberService],

@@ -11,6 +11,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -25,12 +26,14 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { ApiResponse } from 'src/core/api-response/api-response';
 import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { CookieService } from 'src/core/infrastructure/cookie/cookie.service';
 import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pipe';
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import { ArticleScrapSortOption } from 'src/core/types/types';
@@ -74,6 +77,7 @@ export class MemberController {
     private readonly statisticService: StatisticService,
     private readonly articleService: ArticleService,
     private readonly quizService: QuizService,
+    private readonly cookieService: CookieService,
   ) {}
 
   @ApiOperation({
@@ -584,9 +588,14 @@ export class MemberController {
     },
   })
   @Delete('me')
-  async remove(@Req() req: RequestWithUser) {
+  async remove(
+    @Req() req: RequestWithUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const memberId = BigInt(req.user.id);
     await this.memberService.removeMember(memberId);
+    res.cookie('accessToken', '', this.cookieService.getSignOutOptions());
+    res.cookie('refreshToken', '', this.cookieService.getSignOutOptions());
 
     return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
