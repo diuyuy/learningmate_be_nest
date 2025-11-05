@@ -6,7 +6,8 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "**/*.html",
+        "include": "core/resources/templates/*.html",
+        "outDir": "dist",
         "watchAssets": true
       }
     ]

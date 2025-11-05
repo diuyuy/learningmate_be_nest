@@ -1,6 +1,10 @@
+import { join } from 'path';
+
+const templatesDir = join(__dirname, '..', 'resources', 'templates');
+
 export const HTML_PATH = {
-  AUTH_CODE_EMAIL: 'src/core/resources/templates/auth-code-email.html',
-  PASSWD_RESET: 'src/core/resources/templates/passwd-reset-email.html',
+  AUTH_CODE_EMAIL: join(templatesDir, 'auth-code-email.html'),
+  PASSWD_RESET: join(templatesDir, 'passwd-reset-email.html'),
 } as const;
 
 export const EMAIL_SUBJECT = {
