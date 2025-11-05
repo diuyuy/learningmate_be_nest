@@ -19,7 +19,7 @@ export class MainStudyAchievementsResponseDto {
     description: '가장 많이 학습한 카테고리',
     example: '경제',
   })
-  mostStudiedCategory: string;
+  mostStudiedCategory: string | null;
 
   @ApiProperty({
     description: '총 작성한 리뷰 개수',

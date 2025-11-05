@@ -105,7 +105,9 @@ export class StatisticService {
           studyStats: STUDY_FLAGS.COMPLETE,
         },
       }),
-      this.prismaService.$queryRaw<{ name: string; counts: bigint }[]>`
+      this.prismaService.$queryRaw<
+        { name: string | undefined; counts: bigint }[]
+      >`
         SELECT c.name, COUNT(*) AS counts
         FROM Study AS s
         INNER JOIN Keyword AS k ON k.id = s.keywordId
@@ -122,7 +124,7 @@ export class StatisticService {
       }),
     ]);
 
-    const mostStudiedCategory = mostStudied[0].name;
+    const mostStudiedCategory = mostStudied[0]?.name ?? null;
 
     return {
       monthlyAttendanceDays,
