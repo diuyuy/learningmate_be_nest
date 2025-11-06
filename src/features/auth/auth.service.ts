@@ -89,6 +89,9 @@ export class AuthService {
 
     const newRefreshToken = await this.generateRefreshToken(memberInfo);
 
+    // 기존 refresh token 삭제 (재사용 방지)
+    await this.redisService.del(this.generateRefreshTokenKey(refreshToken));
+
     return { accessToken, refreshToken: newRefreshToken };
   }
 
