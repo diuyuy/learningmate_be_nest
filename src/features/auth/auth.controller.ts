@@ -294,7 +294,7 @@ export class AuthController {
 
     if (!refreshToken) {
       throw new CommonException(
-        ResponseStatusFactory.create(ResponseCode.BAD_REQUEST),
+        ResponseStatusFactory.create(ResponseCode.INVALID_REFRESH_TOKEN),
       );
     }
 
