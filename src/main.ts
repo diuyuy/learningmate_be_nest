@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { ApiResponse } from './core/api-response/api-response';
 import { PageResponse } from './core/api-response/page-response';
+import { HttpExceptionFilter } from './core/exception/http-exception-filter';
 import { BigIntInterceptor } from './core/interceptors/bigint.interceptor';
 import { LoggingInterceptor } from './core/interceptors/logging.interceptor';
 import { MemberResponseDto } from './features/member/dto/member-response.dto';
@@ -15,6 +16,7 @@ async function bootstrap() {
   app.setGlobalPrefix('/api');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new LoggingInterceptor(), new BigIntInterceptor());
 
   if (process.env.NODE_ENV !== 'production') {
