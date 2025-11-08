@@ -25,7 +25,7 @@ export class ArticleRepository {
     });
   }
 
-  async findById(id: bigint, memberId: bigint) {
+  async findById(id: bigint) {
     return this.prismaService.article.findUnique({
       select: {
         id: true,
@@ -41,19 +41,27 @@ export class ArticleRepository {
         summary: true,
         title: true,
         views: true,
-        ArticleScrap: {
-          select: {
-            id: true,
-          },
-          where: {
-            memberId,
-          },
-        },
       },
       where: {
         id,
       },
     });
+  }
+
+  async isScrappedByMember(articleId: bigint, memberId: bigint) {
+    const articleScrap = await this.prismaService.articleScrap.findUnique({
+      select: {
+        id: true,
+      },
+      where: {
+        memberId_articleId: {
+          memberId,
+          articleId,
+        },
+      },
+    });
+
+    return !!articleScrap;
   }
 
   async findArticleScraps(

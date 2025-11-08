@@ -36,18 +36,28 @@ export class ArticleService {
     id: bigint,
     memberId: bigint,
   ): Promise<ArticleDetailResponseDto> {
-    const article = await this.articleRepository.findById(id, memberId);
+    const article = await this.cacheService.withCaching({
+      cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.ARTICLE, {
+        articleId: id,
+        memberId,
+      }),
+      fetchFn: async () => this.articleRepository.findById(id),
+      ttlSeconds: 3600,
+    });
 
     if (!article)
       throw new CommonException(
         ResponseStatusFactory.create(ResponseCode.ARTICLE_NOT_FOUND),
       );
 
-    const { ArticleScrap, ...rest } = article;
+    const scrappedByMe = await this.articleRepository.isScrappedByMember(
+      id,
+      memberId,
+    );
 
     return ArticleDetailResponseDto.from({
-      ...rest,
-      scrappedByMe: ArticleScrap.length > 0,
+      ...article,
+      scrappedByMe,
     });
   }
 
