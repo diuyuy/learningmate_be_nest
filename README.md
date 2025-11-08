@@ -26,7 +26,7 @@
 ### Database
 
 - **MySQL**: 메인 데이터베이스
-- **Redis**: Refresh Token 저장 및 배치 작업 메시지 큐
+- **Redis**: Refresh Token 저장, 캐싱 및 배치 작업 메시지 큐
 
 ### Worker Processor
 
