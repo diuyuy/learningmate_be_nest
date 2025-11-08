@@ -38,4 +38,5 @@ README.md
 claude_contexts
 **/*.sql
 **/generated/prisma
+**/README
 # nest-cli.json
