@@ -20,6 +20,13 @@ export class PageReviewCountResponseDto {
   @ApiProperty({ description: '작성자 닉네임', nullable: true, example: null })
   nickname: string | null;
 
+  @ApiProperty({
+    description: '작성자 프로필 이미지',
+    nullable: true,
+    example: null,
+  })
+  imageUrl: string | null;
+
   @ApiProperty({ description: '기사 제목' })
   title: string;
 
@@ -36,6 +43,7 @@ export class PageReviewCountResponseDto {
     createdAt,
     content1,
     nickname,
+    imageUrl,
     title,
     likeCount,
     likedByMe,
@@ -46,6 +54,7 @@ export class PageReviewCountResponseDto {
     this.createdAt = createdAt;
     this.content1 = content1;
     this.nickname = nickname;
+    this.imageUrl = imageUrl;
     this.title = title;
     this.likeCount = likeCount;
     this.likedByMe = likedByMe;
@@ -57,6 +66,7 @@ export class PageReviewCountResponseDto {
       ...rest,
       memberId: member.id,
       nickname: member.nickname,
+      imageUrl: member.imageUrl,
       articleId: article.id,
       title: article.title,
       likeCount: BigInt(_count.likeReview),

@@ -12,6 +12,7 @@ export type ReviewFromPrisma = {
   member: {
     id: bigint;
     nickname: string | null;
+    imageUrl: string | null;
   };
   article: {
     id: bigint;
