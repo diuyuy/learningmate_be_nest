@@ -40,7 +40,7 @@
 
 ## 기술 스택
 
-- **Backend**: NestJS, TypeScript, Prisma, Passport.js, Zod
+- **Backend**: NestJS, TypeScript, Prisma, Passport.js, Zod, Swagger
 - **Database**: MySQL, Redis
 - **Worker**: BullMQ, cheerio
 - **External APIs**: Brave Search API, LLM API
