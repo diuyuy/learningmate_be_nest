@@ -31,7 +31,6 @@
 ### Worker Processor
 
 - Redis Queue 기반 비동기 배치 작업 처리
-- 대용량 데이터 처리 작업을 백그라운드로 분리하여 API 응답 속도 개선
 
 ### Nginx
 
