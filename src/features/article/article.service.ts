@@ -3,7 +3,9 @@ import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { CACHE_PREFIX } from 'src/core/constants/cache-prfix';
 import { CommonException } from 'src/core/exception/common-exception';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleRepository } from './article.repository';
 import { ArticleDetailResponseDto } from './dto/article-detail-response.dto';
@@ -12,11 +14,20 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticleService {
-  constructor(private readonly articleRepository: ArticleRepository) {}
+  constructor(
+    private readonly articleRepository: ArticleRepository,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async findArticlePreviewsByKeyword(keywordId: bigint) {
-    const articleList =
-      await this.articleRepository.findManyByKeywordId(keywordId);
+    const articleList = await this.cacheService.withCaching({
+      cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.ARTICLE, {
+        keywordId,
+      }),
+      fetchFn: async () =>
+        this.articleRepository.findManyByKeywordId(keywordId),
+      ttlSeconds: 3600,
+    });
 
     return articleList.map(ArticlePreviewResponseDto.from);
   }
