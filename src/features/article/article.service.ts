@@ -6,9 +6,8 @@ import {
 import { CommonException } from 'src/core/exception/common-exception';
 import { ArticleScrapSortOption, Pageable } from 'src/core/types/types';
 import { ArticleRepository } from './article.repository';
+import { ArticleDetailResponseDto } from './dto/article-detail-response.dto';
 import { ArticlePreviewResponseDto } from './dto/article-preview-response.dto';
-import { ArticleResponseDto } from './dto/article-response.dto';
-import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
@@ -22,7 +21,10 @@ export class ArticleService {
     return articleList.map(ArticlePreviewResponseDto.from);
   }
 
-  async findById(id: bigint, memberId: bigint): Promise<ArticleResponseDto> {
+  async findById(
+    id: bigint,
+    memberId: bigint,
+  ): Promise<ArticleDetailResponseDto> {
     const article = await this.articleRepository.findById(id, memberId);
 
     if (!article)
@@ -32,7 +34,7 @@ export class ArticleService {
 
     const { ArticleScrap, ...rest } = article;
 
-    return ArticleResponseDto.from({
+    return ArticleDetailResponseDto.from({
       ...rest,
       scrappedByMe: ArticleScrap.length > 0,
     });
@@ -51,10 +53,6 @@ export class ArticleService {
 
   async cancleScrap(memberId: bigint, articleId: bigint) {
     await this.articleRepository.cancelScrap(memberId, articleId);
-  }
-
-  async createArticle(keywordId: bigint, createArticleDto: CreateArticleDto) {
-    return this.articleRepository.createArticle(keywordId, createArticleDto);
   }
 
   async updateArticle(articleId: bigint, updateArticleDto: UpdateArticleDto) {

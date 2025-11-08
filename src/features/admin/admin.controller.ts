@@ -371,15 +371,9 @@ export class AdminController {
     @Param('articleId', ParseBigIntPipe) articleId: bigint,
     @Body() updateArticleDto: UpdateArticleDto,
   ) {
-    const article = await this.adminService.updateArticle(
-      articleId,
-      updateArticleDto,
-    );
+    await this.adminService.updateArticle(articleId, updateArticleDto);
 
-    return ApiResponse.from(
-      ResponseStatusFactory.create(ResponseCode.OK),
-      article,
-    );
+    return ApiResponse.from(ResponseStatusFactory.create(ResponseCode.OK));
   }
 
   @ApiOperation({
