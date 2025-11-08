@@ -3,7 +3,11 @@ import { PageResponse } from 'src/core/api-response/page-response';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { Pageable, ReviewSortOption } from '../../core/types/types';
-import { PageReviewCountResponseDto, ReviewCreateRequestDto } from './dto';
+import {
+  PageReviewCountResponseDto,
+  ReviewCreateRequestDto,
+  ReviewUpdateRequestDto,
+} from './dto';
 import { PageMyReviewResponseDto } from './dto/page-my-review-response.dto';
 
 @Injectable()
@@ -28,6 +32,8 @@ export class ReviewRepository {
       const review = await prisma.review.create({
         data: {
           ...data,
+          content2: '',
+          content3: '',
           memberId,
           articleId,
         },
@@ -69,10 +75,7 @@ export class ReviewRepository {
     });
   }
 
-  async update(
-    reviewId: bigint,
-    data: { content1: string; content2: string; content3: string },
-  ) {
+  async update(reviewId: bigint, data: ReviewUpdateRequestDto) {
     return this.prismaService.review.update({
       data,
       select: this.reviewSelect,
@@ -303,6 +306,7 @@ export class ReviewRepository {
         select: {
           id: true,
           nickname: true,
+          imageUrl: true,
         },
       },
       _count: {

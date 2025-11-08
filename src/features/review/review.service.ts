@@ -64,7 +64,7 @@ export class ReviewService {
   async update({
     memberId,
     reviewId,
-    reviewUpdateRequestDto: { content1, content2, content3 },
+    reviewUpdateRequestDto: { content1 },
   }: {
     memberId: bigint;
     reviewId: bigint;
@@ -74,8 +74,6 @@ export class ReviewService {
 
     const updatedReview = await this.reviewRepository.update(reviewId, {
       content1,
-      content2,
-      content3,
     });
 
     return MyReviewResponseDto.from(updatedReview);
