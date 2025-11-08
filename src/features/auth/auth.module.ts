@@ -36,6 +36,7 @@ import { LocalStrategy } from './strategy/local-strategy';
       useFactory: (configService: ConfigService<EnvSchema, true>) => ({
         host: configService.get<string>('REDIS_HOST'),
         port: configService.get<number>('REDIS_PORT'),
+        isGlobal: true,
       }),
       inject: [ConfigService],
     }),

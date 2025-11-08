@@ -4,7 +4,9 @@ import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { CACHE_PREFIX } from 'src/core/constants/cache-prfix';
 import { CommonException } from 'src/core/exception/common-exception';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { KeywordSortOption, Pageable } from 'src/core/types/types';
 import {
@@ -16,21 +18,32 @@ import { KeywordDetailResponseDto } from './dto/keyword-detail-response.dto';
 
 @Injectable()
 export class KeywordService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async findByPeriod(startDate: Date, endDate: Date) {
-    const todaysKeywords = await this.prismaService.todaysKeyword.findMany({
-      select: {
-        id: true,
-        date: true,
-        keyword: true,
-      },
-      where: {
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
+    const todaysKeywords = await this.cacheService.withCaching({
+      cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.KEYWORD, {
+        startDate,
+        endDate,
+      }),
+      fetchFn: async () =>
+        await this.prismaService.todaysKeyword.findMany({
+          select: {
+            id: true,
+            date: true,
+            keyword: true,
+          },
+          where: {
+            date: {
+              gte: startDate,
+              lte: endDate,
+            },
+          },
+        }),
+      ttlSeconds: 3600,
     });
 
     return todaysKeywords.map(TodaysKeywordResponseDto.from);
