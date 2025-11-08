@@ -48,6 +48,39 @@
 
 ## 프로젝트 구조
 
+```text
+src/
+├── core/                      # 핵심 공통 기능
+│   ├── config/               # 환경 변수 검증 등 설정
+│   ├── constants/            # 상수 정의
+│   ├── types/                # 공통 타입 정의
+│   ├── api-response/         # API 응답 포맷
+│   ├── exception/            # 예외 처리
+│   ├── infrastructure/       # 인프라 레이어
+│   │   ├── ai/              # LLM API 통합
+│   │   ├── io-redis/        # Redis 클라이언트
+│   │   ├── prisma-module/   # Prisma ORM
+│   │   ├── s3/              # AWS S3
+│   │   ├── email/           # 이메일 서비스
+│   │   └── cookie/          # 쿠키 관리
+│   ├── pipes/                # 검증 파이프
+│   ├── interceptors/         # 인터셉터
+│   └── resources/            # 리소스 (프롬프트, 이메일 템플릿)
+├── features/                  # 기능별 모듈
+│   ├── admin/               # 관리자 및 배치 작업
+│   ├── article/             # 뉴스 아티클
+│   ├── auth/                # 인증/인가
+│   ├── keyword/             # 경제 키워드
+│   ├── member/              # 회원 관리
+│   ├── quiz/                # 퀴즈
+│   ├── review/              # 학습 리뷰
+│   ├── statistic/           # 통계
+│   ├── study/               # 학습 기록
+│   └── video/               # 유튜브 영상
+├── app.module.ts             # 루트 모듈
+└── main.ts                   # 애플리케이션 진입점
+```
+
 ## 주요 기능
 
 ## 주요 개선 사항
