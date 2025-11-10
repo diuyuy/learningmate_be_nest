@@ -32,6 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       headers: {
         'content-type': request.get('Content-Type'),
         authorization: request.get('Authorization') ? '[MASKED]' : undefined,
+        'X-Forwarded-For': request.get('x-forwarded-for'),
       },
     };
 

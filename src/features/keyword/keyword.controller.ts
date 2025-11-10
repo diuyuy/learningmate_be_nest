@@ -59,8 +59,8 @@ export class KeywordController {
   ) {}
 
   @ApiOperation({ summary: '기간별 오늘의 키워드 조회' })
-  @ApiQuery({ name: 'startDate', description: '시작 날짜', type: Number })
-  @ApiQuery({ name: 'endDate', description: '종료 날짜', type: Number })
+  @ApiQuery({ name: 'startDate', description: '시작 날짜', type: Date })
+  @ApiQuery({ name: 'endDate', description: '종료 날짜', type: Date })
   @ApiResponseDecorator({
     status: 200,
     description: '오늘의 키워드 목록 조회 성공',

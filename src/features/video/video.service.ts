@@ -3,20 +3,32 @@ import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { CACHE_PREFIX } from 'src/core/constants/cache-prfix';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 import { CommonException } from 'src/core/exception/common-exception';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { VideoResponseDto } from './dto/video-response.dto';
 
 @Injectable()
 export class VideoService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async findByKeywordId(keywordId: bigint) {
-    const video = await this.prismaService.video.findFirst({
-      where: {
+    const video = await this.cacheService.withCaching({
+      cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.VIDEO, {
         keywordId,
-      },
+      }),
+      fetchFn: async () =>
+        this.prismaService.video.findFirst({
+          where: {
+            keywordId,
+          },
+        }),
+      ttlSeconds: 3600,
     });
 
     if (!video) {

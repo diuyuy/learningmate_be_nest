@@ -16,7 +16,7 @@ export class CacheService {
   constructor(private readonly ioRedisService: IoRedisService) {}
 
   async withCaching<T>(options: CacheOptions<T>): Promise<T> {
-    const { cacheKey, fetchFn, ttlSeconds } = options;
+    const { cacheKey, fetchFn, ttlSeconds = 3600 } = options;
 
     try {
       const cached = await this.ioRedisService.get(cacheKey);

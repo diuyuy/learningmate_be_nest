@@ -5,7 +5,9 @@ import {
   ResponseCode,
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
+import { CACHE_PREFIX } from 'src/core/constants/cache-prfix';
 import { CommonException } from 'src/core/exception/common-exception';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { IncorrectQuizSortOption, Pageable } from 'src/core/types/types';
 import { STUDY_FLAGS } from '../../core/constants/study-flag';
@@ -19,13 +21,23 @@ import { UpdateQuizRequestDto } from './dto/update-quiz-request.dto';
 
 @Injectable()
 export class QuizService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async findManyByArticleId(articleId: bigint) {
-    const quizzes = await this.prismaService.quiz.findMany({
-      where: {
+    const quizzes = await this.cacheService.withCaching({
+      cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.QUIZ, {
         articleId,
-      },
+      }),
+      fetchFn: async () =>
+        this.prismaService.quiz.findMany({
+          where: {
+            articleId,
+          },
+        }),
+      ttlSeconds: 3600,
     });
 
     return QuizResponseDto.fromList(quizzes);
