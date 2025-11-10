@@ -4,6 +4,7 @@ import {
   ResponseStatusFactory,
 } from 'src/core/api-response/response-status';
 import { CommonException } from 'src/core/exception/common-exception';
+import { IoRedisService } from 'src/core/infrastructure/io-redis/io-redis.service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { S3Service } from 'src/core/infrastructure/s3/s3.service';
 import { MemberResponseDto, MemberUpdateRequestDto } from './dto';
@@ -14,6 +15,7 @@ export class MemberService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
+    private readonly ioRedisService: IoRedisService,
   ) {}
 
   async create(createMemberDto: CreateMemberDto) {
@@ -112,7 +114,7 @@ export class MemberService {
     });
   }
 
-  async removeMember(id: bigint) {
+  async removeMember(id: bigint, refreshToken?: string) {
     const member = await this.prismaService.member.findUnique({
       select: { imageUrl: true },
       where: {
@@ -143,5 +145,9 @@ export class MemberService {
       }),
       member.imageUrl && this.s3Service.deleteImage(member.imageUrl),
     ]);
+
+    if (refreshToken) {
+      await this.ioRedisService.del(refreshToken);
+    }
   }
 }
