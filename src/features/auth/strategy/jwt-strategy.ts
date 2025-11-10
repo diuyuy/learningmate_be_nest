@@ -18,12 +18,7 @@ export class JwtStrategy extends PassportStrategy(
   Strategy,
   PASSPORT_STRATEGY_NAME.JWT,
 ) {
-  constructor(
-    private readonly configService: ConfigService<
-      z.infer<typeof envSchema>,
-      true
-    >,
-  ) {
+  constructor(configService: ConfigService<z.infer<typeof envSchema>, true>) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req: Request) => {
