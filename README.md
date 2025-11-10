@@ -1,98 +1,117 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Learningmate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![alt text](./README/images/image.png)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**🔗 Demo**: [https://learningmate.cloud](https://learningmate.cloud)
 
-## Description
+## 프로젝트 설명
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+경제 용어 학습을 돕는 AI 기반 학습 플랫폼입니다. 매일 새로운 경제 용어와 관련 학습 컨텐츠(동영상, AI 생성 아티클, 퀴즈)를 제공하여 경제 지식을 체계적으로 쌓을 수 있도록 돕습니다.
 
-## Project setup
+**개발 기간**: 2025.8월 ~ 2025.11월
 
-```bash
-$ pnpm install
+**팀 구성**: 3명
+
+해당 프로젝트는 기존 3인 팀으로 개발했던 Spring Boot 코드를 기반으로 마이그레이션 한 프로젝트이며, NestJS로의 마이그레이션 및 기능 확장은 모두 혼자서 진행했습니다.
+
+## 서버 아키텍처
+
+![alt text](./README/images/architecture.png)
+
+### Application Server
+
+- NestJS기반 RESTful API 서버
+- JWT 기반 인증/인가 구현
+
+### Database
+
+- **MySQL**: 메인 데이터베이스
+- **Redis**:
+  - Refresh Token 저장
+  - 데이터 캐싱
+  - 메시지 큐 (BullMQ)
+
+### Worker Processor
+
+- Redis Queue 기반 비동기 배치 작업 처리
+
+### Nginx
+
+- Reverse Proxy - API 요청을 NestJS로 전달
+- Web Server - React 정적 파일 서빙
+- SSL Termination Point - HTTPS 암호화 처리
+
+### AWS S3 & AWS CloudFront
+
+- 객체 스토리지
+- CDN
+
+## 기술 스택
+
+- **Backend**: NestJS, TypeScript, Prisma, Passport.js, Zod, Swagger
+- **Database**: MySQL, Redis
+- **Worker**: BullMQ, cheerio
+- **External APIs**: Brave Search API, LLM API
+- **Infrastructure**: Nginx, Docker, AWS EC2, AWS ECR, AWS S3
+
+## 프로젝트 구조
+
+```text
+src/
+├── core/                      # 핵심 공통 기능
+│   ├── config/               # 환경 변수 검증 등 설정
+│   ├── constants/            # 상수 정의
+│   ├── types/                # 공통 타입 정의
+│   ├── api-response/         # API 응답 포맷
+│   ├── exception/            # 예외 처리
+│   ├── infrastructure/       # 인프라 레이어
+│   │   ├── ai/              # LLM API 통합
+│   │   ├── io-redis/        # Redis 클라이언트
+│   │   ├── prisma-module/   # Prisma ORM
+│   │   ├── s3/              # AWS S3
+│   │   ├── email/           # 이메일 서비스
+│   │   └── cookie/          # 쿠키 관리
+│   ├── pipes/                # 검증 파이프
+│   ├── interceptors/         # 인터셉터
+│   └── resources/            # 리소스 (프롬프트, 이메일 템플릿)
+├── features/                  # 기능별 모듈
+│   ├── admin/               # 관리자 및 배치 작업
+│   ├── article/             # 뉴스 아티클
+│   ├── auth/                # 인증/인가
+│   ├── keyword/             # 경제 키워드
+│   ├── member/              # 회원 관리
+│   ├── quiz/                # 퀴즈
+│   ├── review/              # 학습 리뷰
+│   ├── statistic/           # 통계
+│   ├── study/               # 학습 기록
+│   └── video/               # 유튜브 영상
+├── app.module.ts             # 루트 모듈
+└── main.ts                   # 애플리케이션 진입점
 ```
 
-## Compile and run the project
+## 주요 기능
 
-```bash
-# development
-$ pnpm run start
+### 학습 기능
 
-# watch mode
-$ pnpm run start:dev
+- **일일 경제 키워드 제공**: 매일 새로운 경제 용어와 설명을 제공
+- **다양한 학습 컨텐츠**: 키워드 관련 유튜브 영상, AI 생성 뉴스 아티클 제공
+- **인터랙티브 퀴즈**: 학습한 내용을 확인할 수 있는 퀴즈 시스템
+- **학습 리뷰 작성**: 학습한 키워드에 대한 개인 리뷰 작성
 
-# production mode
-$ pnpm run start:prod
-```
+### 회원 기능
 
-## Run tests
+- **회원가입/로그인**: JWT 기반 인증 시스템
+- **학습 기록 추적**: 개인별 학습 진도 및 히스토리 관리
+- **학습 통계**: 학습 달성률, 진행 상황 시각화
 
-```bash
-# unit tests
-$ pnpm run test
+### 관리자 기능
 
-# e2e tests
-$ pnpm run test:e2e
+- **컨텐츠 관리**: 경제 키워드, 아티클, 퀴즈 관리
+- **배치 작업**: 일일 컨텐츠 생성
 
-# test coverage
-$ pnpm run test:cov
-```
+## 주요 기술적 의사 결정
 
-## Deployment
+### Redis를 활용한 성능 최적화
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- 동일한 키워드, 아티클 그리고 키워드에 대한 반복적인 DB 조회를 줄이고자 Redis 캐시를 적용해 동일한 데이터에 대한 반복적인 조회를 감소시켰습니다.
+- 아티클 및 퀴즈를 생성하는 배치 작업을 메인 API 서버와 같은 프로세스에서 실행시킬 시 Node.js는 싱글 스레드인 관계로 작업하는 동안 API 서버 성능 저하 문제를 일으킬 수 있다고 판단했습니다. 따라서 BullMQ 라이브러리를 사용해 배치 작업을 별도의 프로세스에서 비동기로 실행하게 함으로써 배치 작업 기간 동안의 API 서버 성능 저하를 감소시켰습니다.
