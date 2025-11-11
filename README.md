@@ -144,11 +144,13 @@ src/
 
 ### 3. AI 기반 아티클 및 퀴즈 생성 파이프라인
 
+> Worker의 코드는 [여기](https://github.com/diuyuy/learningmate_batch_worker)에서 확인하실 수 있습니다.
+
 1. **데이터 수집**
-   - Brave Search API를 통해 키워드 관련 검색 결과 상위 20개 수집
+   - **Brave Search API**를 통해 키워드 관련 검색 결과 상위 20개 수집
 
 2. **콘텐츠 추출**
-   - Cheerio 라이브러리로 HTML 파싱 및 본문 텍스트 추출
+   - **Cheerio** 라이브러리로 HTML 파싱 및 본문 텍스트 추출
    - 광고, 스크립트 등 불필요한 요소 제거
 
 3. **관련 문서 선별**
