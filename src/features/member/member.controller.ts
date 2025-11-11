@@ -593,9 +593,8 @@ export class MemberController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const memberId = BigInt(req.user.id);
-    const refreshToken = req.cookies.refreshToken as string | undefined;
 
-    await this.memberService.removeMember(memberId, refreshToken);
+    await this.memberService.removeMember(memberId);
     res.cookie('accessToken', '', this.cookieService.getSignOutOptions());
     res.cookie('refreshToken', '', this.cookieService.getSignOutOptions());
 

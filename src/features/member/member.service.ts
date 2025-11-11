@@ -114,7 +114,7 @@ export class MemberService {
     });
   }
 
-  async removeMember(id: bigint, refreshToken?: string) {
+  async removeMember(id: bigint) {
     const member = await this.prismaService.member.findUnique({
       select: { imageUrl: true },
       where: {
@@ -130,6 +130,10 @@ export class MemberService {
 
     const deletedAt = new Date();
 
+    // 회원 탈퇴 시 모든 refresh token 삭제
+    const memberTokensKey = `MEMBER_TOKENS:${id}`;
+    const refreshTokens = await this.ioRedisService.smembers(memberTokensKey);
+
     await Promise.all([
       this.prismaService.member.update({
         data: {
@@ -144,10 +148,12 @@ export class MemberService {
         },
       }),
       member.imageUrl && this.s3Service.deleteImage(member.imageUrl),
+      // 모든 refresh token 삭제
+      ...refreshTokens.map((token) =>
+        this.ioRedisService.del(`REFRESH:${token}`),
+      ),
+      // member tokens key 삭제
+      refreshTokens.length > 0 && this.ioRedisService.del(memberTokensKey),
     ]);
-
-    if (refreshToken) {
-      await this.ioRedisService.del(refreshToken);
-    }
   }
 }
