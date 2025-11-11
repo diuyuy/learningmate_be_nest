@@ -32,6 +32,13 @@ export class ArticleService {
     return articleList.map(ArticlePreviewResponseDto.from);
   }
 
+  async findArticlePreviewsInAdmin(keywordId: bigint) {
+    const articleList =
+      await this.articleRepository.findManyByKeywordId(keywordId);
+
+    return articleList.map(ArticlePreviewResponseDto.from);
+  }
+
   async findById(
     id: bigint,
     memberId: bigint,

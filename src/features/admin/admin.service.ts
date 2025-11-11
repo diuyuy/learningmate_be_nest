@@ -31,6 +31,10 @@ export class AdminService {
     return this.quizService.findQuizDetailsByArticleId(articleId);
   }
 
+  async findArticles(keywordId: bigint) {
+    return this.articleService.findArticlePreviewsInAdmin(keywordId);
+  }
+
   async updateKeyword(keywordId: bigint, updateKeywordDto: UpdateKeywordDto) {
     return this.keywordService.updateKeyword(keywordId, updateKeywordDto);
   }
