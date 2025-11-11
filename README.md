@@ -144,8 +144,6 @@ src/
 
 ### 3. AI 기반 아티클 및 퀴즈 생성 파이프라인
 
-**RAG(Retrieval-Augmented Generation) 기반 구현:**
-
 1. **데이터 수집**
    - Brave Search API를 통해 키워드 관련 검색 결과 상위 20개 수집
 
