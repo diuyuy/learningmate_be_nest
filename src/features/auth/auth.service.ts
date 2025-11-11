@@ -57,7 +57,18 @@ export class AuthService {
   }
 
   async signOut(refreshToken: string) {
-    await this.redisService.del(refreshToken);
+    const refreshTokenKey = this.generateRefreshTokenKey(refreshToken);
+    const memberInfoJson = await this.redisService.get(refreshTokenKey);
+
+    if (memberInfoJson) {
+      const memberInfo = JSON.parse(memberInfoJson) as MemberInfo;
+      await this.redisService.srem(
+        this.generateMemberTokensKey(memberInfo.id),
+        refreshToken,
+      );
+    }
+
+    await this.redisService.del(refreshTokenKey);
   }
 
   async signUp({ email, password, authCode }: SignUpRequestDto) {
@@ -90,7 +101,13 @@ export class AuthService {
     const newRefreshToken = await this.generateRefreshToken(memberInfo);
 
     // 기존 refresh token 삭제 (재사용 방지)
-    await this.redisService.del(this.generateRefreshTokenKey(refreshToken));
+    await Promise.all([
+      this.redisService.del(this.generateRefreshTokenKey(refreshToken)),
+      this.redisService.srem(
+        this.generateMemberTokensKey(memberInfo.id),
+        refreshToken,
+      ),
+    ]);
 
     return { accessToken, refreshToken: newRefreshToken };
   }
@@ -117,8 +134,7 @@ export class AuthService {
         authCode,
         3 * 60,
       );
-    } catch (error) {
-      console.error(error);
+    } catch {
       throw new CommonException(
         ResponseStatusFactory.create(ResponseCode.SEND_EMAIL_FAIL),
       );
@@ -157,11 +173,20 @@ export class AuthService {
       );
     }
 
+    const member = await this.memberService.findByEmail(email);
+
+    if (!member) {
+      throw new CommonException(
+        ResponseStatusFactory.create(ResponseCode.EMAIL_NOT_FOUND),
+      );
+    }
+
     const passwordHash = await bcrypt.hash(password, this.SALT_OR_AROUNDS);
 
     await Promise.all([
       this.memberService.updatePassword(email, passwordHash),
       this.redisService.del(authToken),
+      this.revokeAllRefreshTokens(member.id.toString()),
     ]);
   }
 
@@ -177,6 +202,23 @@ export class AuthService {
     }
   }
 
+  async revokeAllRefreshTokens(memberId: string) {
+    const memberTokensKey = this.generateMemberTokensKey(memberId);
+    const refreshTokens = await this.redisService.smembers(memberTokensKey);
+
+    if (refreshTokens.length === 0) {
+      return;
+    }
+
+    // 모든 refresh token 삭제
+    await Promise.all([
+      ...refreshTokens.map((token) =>
+        this.redisService.del(this.generateRefreshTokenKey(token)),
+      ),
+      this.redisService.del(memberTokensKey),
+    ]);
+  }
+
   private generateAccessToken({ id, role }: MemberInfo) {
     const payload = { sub: id, role };
 
@@ -188,11 +230,24 @@ export class AuthService {
     const expiresDay = this.configService.get<number>(
       'AUTH_REFRESH_TOKEN_EXPIRATION_DAYS',
     );
+    const ttlSeconds = expiresDay * 24 * 3600;
 
-    await this.redisService.set(
-      this.generateRefreshTokenKey(refreshToken),
-      JSON.stringify(memberInfo),
-      expiresDay * 24 * 3600,
+    await Promise.all([
+      this.redisService.set(
+        this.generateRefreshTokenKey(refreshToken),
+        JSON.stringify(memberInfo),
+        ttlSeconds,
+      ),
+      this.redisService.sadd(
+        this.generateMemberTokensKey(memberInfo.id),
+        refreshToken,
+      ),
+    ]);
+
+    // Set member tokens key TTL to match refresh token expiration
+    await this.redisService.expire(
+      this.generateMemberTokensKey(memberInfo.id),
+      ttlSeconds,
     );
 
     return refreshToken;
@@ -204,5 +259,9 @@ export class AuthService {
 
   private generateRefreshTokenKey(refreshToken: string) {
     return `REFRESH:${refreshToken}`;
+  }
+
+  private generateMemberTokensKey(memberId: string) {
+    return `MEMBER_TOKENS:${memberId}`;
   }
 }

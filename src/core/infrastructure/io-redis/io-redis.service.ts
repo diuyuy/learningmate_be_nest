@@ -194,6 +194,39 @@ export class IoRedisService implements OnModuleDestroy {
     }
   }
 
+  async sadd(key: string, ...values: string[]): Promise<number> {
+    try {
+      const result = await this.redisClient.sadd(key, ...values);
+      this.logger.debug(`SADD ${key} ${values.join(', ')}: ${result} added`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to SADD ${key}`, error.stack);
+      throw error;
+    }
+  }
+
+  async smembers(key: string): Promise<string[]> {
+    try {
+      const result = await this.redisClient.smembers(key);
+      this.logger.debug(`SMEMBERS ${key}: ${result.length} elements`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to SMEMBERS ${key}`, error.stack);
+      throw error;
+    }
+  }
+
+  async srem(key: string, ...values: string[]): Promise<number> {
+    try {
+      const result = await this.redisClient.srem(key, ...values);
+      this.logger.debug(`SREM ${key} ${values.join(', ')}: ${result} removed`);
+      return result;
+    } catch (error) {
+      this.logger.error(`Failed to SREM ${key}`, error.stack);
+      throw error;
+    }
+  }
+
   async onModuleDestroy() {
     this.logger.log('Closing Redis connection');
     await this.redisClient.quit();
