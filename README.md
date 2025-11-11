@@ -65,7 +65,6 @@ src/
 │   ├── api-response/         # API 응답 포맷
 │   ├── exception/            # 예외 처리
 │   ├── infrastructure/       # 인프라 레이어
-│   │   ├── ai/              # LLM API 통합
 │   │   ├── io-redis/        # Redis 클라이언트
 │   │   ├── prisma-module/   # Prisma ORM
 │   │   ├── s3/              # AWS S3
