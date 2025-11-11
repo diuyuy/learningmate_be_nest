@@ -24,9 +24,6 @@
     "db:mig": "prisma migrate dev"
   },
   "dependencies": {
-    "@ai-sdk/google": "^2.0.24",
-    "@ai-sdk/openai": "2.1.0-beta.11",
-    "@ai-sdk/xai": "^2.0.23",
     "@aws-sdk/client-s3": "^3.901.0",
     "@aws-sdk/s3-request-presigner": "^3.901.0",
     "@nestjs/bullmq": "^11.0.4",
@@ -39,7 +36,6 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.1",
     "@prisma/client": "6.18.0",
-    "ai": "5.1.0-beta.21",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.62.1",
     "cheerio": "^1.1.2",
