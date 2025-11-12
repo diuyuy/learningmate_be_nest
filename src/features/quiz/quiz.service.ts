@@ -88,7 +88,10 @@ export class QuizService {
     return PageResponse.from(items, Number(totalElements), pageAble);
   }
 
-  async updateQuiz(id: bigint, updateQuizRequestDto: UpdateQuizRequestDto) {
+  async updateQuiz(
+    id: bigint,
+    updateQuizRequestDto: UpdateQuizRequestDto,
+  ): Promise<QuizResponseDto> {
     const quiz = await this.prismaService.quiz.update({
       data: updateQuizRequestDto,
       where: {

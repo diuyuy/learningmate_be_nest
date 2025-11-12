@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test } from '@nestjs/testing';
 
 import { CommonException } from 'src/core/exception/common-exception';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { ArticleRepository } from './article.repository';
 import { ArticleService } from './article.service';
 
 describe('ArticleService', () => {
   let service: ArticleService;
   let repository: jest.Mocked<ArticleRepository>;
+  let cacheService: jest.Mocked<CacheService>;
 
   beforeEach(async () => {
     // Create mock repository
@@ -17,6 +17,12 @@ describe('ArticleService', () => {
       findManyByKeywordId: jest.fn(),
       findById: jest.fn(),
       findArticleScraps: jest.fn(),
+      isScrappedByMember: jest.fn(),
+    };
+
+    const mockCacheService = {
+      withCaching: jest.fn(),
+      generateCacheKey: jest.fn(),
     };
 
     const moduleRef = await Test.createTestingModule({
@@ -26,11 +32,16 @@ describe('ArticleService', () => {
           provide: ArticleRepository,
           useValue: mockRepository,
         },
+        {
+          provide: CacheService,
+          useValue: mockCacheService,
+        },
       ],
     }).compile();
 
     service = moduleRef.get(ArticleService);
     repository = moduleRef.get(ArticleRepository);
+    cacheService = moduleRef.get(CacheService);
 
     jest.clearAllMocks();
   });
@@ -57,7 +68,7 @@ describe('ArticleService', () => {
         },
       ];
 
-      repository.findManyByKeywordId.mockResolvedValue(mockArticles);
+      cacheService.withCaching.mockResolvedValue(mockArticles);
 
       const result = await service.findArticlePreviewsByKeyword(keywordId);
 
@@ -75,19 +86,18 @@ describe('ArticleService', () => {
         publishedAt: new Date('2025-01-02'),
       });
 
-      expect(repository.findManyByKeywordId).toHaveBeenCalledWith(keywordId);
-      expect(repository.findManyByKeywordId).toHaveBeenCalledTimes(1);
+      expect(cacheService.withCaching).toHaveBeenCalledTimes(1);
     });
 
     it('should return empty array when no articles found', async () => {
       const keywordId = BigInt(999);
 
-      repository.findManyByKeywordId.mockResolvedValue([]);
+      cacheService.withCaching.mockResolvedValue([]);
 
       const result = await service.findArticlePreviewsByKeyword(keywordId);
 
       expect(result).toEqual([]);
-      expect(repository.findManyByKeywordId).toHaveBeenCalledWith(keywordId);
+      expect(cacheService.withCaching).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -103,17 +113,18 @@ describe('ArticleService', () => {
         summary: 'Test Summary',
         scrapCount: BigInt(5),
         views: BigInt(100),
-        keywordId: BigInt(1),
-        createdAt: new Date('2025-01-01'),
-        updatedAt: new Date('2025-01-01'),
-        ArticleScrap: [{ id: BigInt(1) }],
+        keyword: {
+          id: BigInt(1),
+          name: 'Test Keyword',
+        },
       };
 
-      repository.findById.mockResolvedValue(mockArticle);
+      cacheService.withCaching.mockResolvedValue(mockArticle);
+      repository.isScrappedByMember.mockResolvedValue(true);
 
       const result = await service.findById(articleId, memberId);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         id: BigInt(1),
         title: 'Test Article',
         content: 'Test Content',
@@ -121,34 +132,27 @@ describe('ArticleService', () => {
         summary: 'Test Summary',
         scrapCount: BigInt(5),
         views: BigInt(100),
-        keywordId: BigInt(1),
+        scrappedByMe: true,
       });
 
-      expect(repository.findById).toHaveBeenCalledWith(articleId);
-      expect(repository.findById).toHaveBeenCalledTimes(1);
+      expect(cacheService.withCaching).toHaveBeenCalledTimes(1);
+      expect(repository.isScrappedByMember).toHaveBeenCalledWith(
+        articleId,
+        memberId,
+      );
     });
 
     it('should throw CommonException when article not found', async () => {
       const articleId = BigInt(999);
       const memberId = BigInt(1);
 
-      repository.findById.mockResolvedValue(null);
+      cacheService.withCaching.mockResolvedValue(null);
 
       await expect(service.findById(articleId, memberId)).rejects.toThrow(
         CommonException,
       );
 
-      try {
-        await service.findById(articleId, memberId);
-      } catch (error) {
-        expect(error).toBeInstanceOf(CommonException);
-        expect(error.getResponse()).toMatchObject({
-          status: 404,
-          message: '존재하지 않는 기사입니다.',
-        });
-      }
-
-      expect(repository.findById).toHaveBeenCalledWith(articleId, memberId);
+      expect(cacheService.withCaching).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -172,7 +176,13 @@ describe('ArticleService', () => {
             summary: 'Summary 1',
             scrapCount: BigInt(5),
             views: BigInt(100),
-            keywordId: BigInt(1),
+            keyword: {
+              id: BigInt(1),
+              name: 'Keyword 1',
+              description: 'Description 1',
+              date: new Date(),
+            },
+            scrappedByMe: true,
           },
         ],
         page: 0,

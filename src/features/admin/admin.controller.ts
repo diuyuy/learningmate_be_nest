@@ -11,6 +11,7 @@ import {
 import {
   ApiExtraModels,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiResponse as ApiResponseDecorator,
   ApiTags,
@@ -28,6 +29,7 @@ import { ParseNonNegativeIntPipe } from 'src/core/pipes/parse-nonnegative-int-pi
 import { ParsePageSortPipe } from 'src/core/pipes/parse-page-sort-pipe';
 import type { PageSortOption } from 'src/core/types/types';
 import { KeywordSortOption } from 'src/core/types/types';
+import { ArticlePreviewResponseDto } from '../article/dto/article-preview-response.dto';
 import { ArticleResponseDto } from '../article/dto/article-response.dto';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { Roles } from '../auth/decorators/roles';
@@ -51,6 +53,7 @@ import { BatchJobStateResponseDto } from './dto/batch-job-state-response.dto';
   QuizResponseDto,
   BatchJobResponseDto,
   BatchJobStateResponseDto,
+  ArticlePreviewResponseDto,
 )
 @Roles(['admin'])
 @UseGuards(RoleGuard)
@@ -131,6 +134,37 @@ export class AdminController {
     return ApiResponse.from(
       ResponseStatusFactory.create(ResponseCode.OK),
       keywords,
+    );
+  }
+
+  @ApiOperation({ summary: '키워드별 기사 목록 조회' })
+  @ApiParam({ name: 'keywordId', description: '키워드 ID', type: Number })
+  @ApiResponseDecorator({
+    status: 200,
+    description: '기사 목록 조회 성공',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            result: {
+              type: 'array',
+              items: { $ref: getSchemaPath(ArticlePreviewResponseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
+  @Get('keywords/:keywordId/articles')
+  async findArticlesByKeywordId(
+    @Param('keywordId', ParseBigIntPipe) keywordId: bigint,
+  ) {
+    const articles = await this.adminService.findArticles(keywordId);
+
+    return ApiResponse.from(
+      ResponseStatusFactory.create(ResponseCode.OK),
+      articles,
     );
   }
 

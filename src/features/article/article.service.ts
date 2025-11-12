@@ -32,6 +32,13 @@ export class ArticleService {
     return articleList.map(ArticlePreviewResponseDto.from);
   }
 
+  async findArticlePreviewsInAdmin(keywordId: bigint) {
+    const articleList =
+      await this.articleRepository.findManyByKeywordId(keywordId);
+
+    return articleList.map(ArticlePreviewResponseDto.from);
+  }
+
   async findById(
     id: bigint,
     memberId: bigint,
@@ -39,7 +46,6 @@ export class ArticleService {
     const article = await this.cacheService.withCaching({
       cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.ARTICLE, {
         articleId: id,
-        memberId,
       }),
       fetchFn: async () => this.articleRepository.findById(id),
       ttlSeconds: 3600,

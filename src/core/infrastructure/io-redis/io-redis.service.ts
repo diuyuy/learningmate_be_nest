@@ -227,6 +227,43 @@ export class IoRedisService implements OnModuleDestroy {
     }
   }
 
+  async scanAndDelete(pattern: string): Promise<number> {
+    try {
+      let cursor = '0';
+      let totalDeleted = 0;
+      const keysToDelete: string[] = [];
+
+      do {
+        const [nextCursor, keys] = await this.redisClient.scan(
+          cursor,
+          'MATCH',
+          pattern,
+          'COUNT',
+          100,
+        );
+        cursor = nextCursor;
+        keysToDelete.push(...keys);
+      } while (cursor !== '0');
+
+      if (keysToDelete.length > 0) {
+        totalDeleted = await this.redisClient.del(...keysToDelete);
+        this.logger.debug(
+          `SCAN and DEL pattern ${pattern}: ${totalDeleted} key(s) deleted`,
+        );
+      } else {
+        this.logger.debug(`SCAN pattern ${pattern}: no keys found`);
+      }
+
+      return totalDeleted;
+    } catch (error) {
+      this.logger.error(
+        `Failed to SCAN and DEL pattern ${pattern}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
+
   async onModuleDestroy() {
     this.logger.log('Closing Redis connection');
     await this.redisClient.quit();
