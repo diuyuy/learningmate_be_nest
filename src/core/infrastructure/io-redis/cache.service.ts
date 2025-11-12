@@ -60,6 +60,22 @@ export class CacheService {
     }
   }
 
+  async invalidateByPattern(pattern: string) {
+    try {
+      const totalDeleted = await this.ioRedisService.scanAndDelete(pattern);
+      this.logger.debug(
+        `Cache invalidated by pattern: ${pattern}, ${totalDeleted} key(s) deleted`,
+      );
+      return totalDeleted;
+    } catch (error) {
+      this.logger.error(
+        `Failed to invalidate cache by pattern: ${pattern}`,
+        error instanceof Error ? error.stack : error,
+      );
+      throw error;
+    }
+  }
+
   generateCacheKey(prefix: string, obj: Record<string, unknown>) {
     const hash = createHash('sha256')
       .update(superjson.stringify(obj))
