@@ -1,18 +1,32 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/unbound-method */
 import { Test } from '@nestjs/testing';
 
-import type { MockPrisma } from 'src/core/infrastructure/prisma-module/__mocks__/mock-prisma-service';
-import { createMockPrisma } from 'src/core/infrastructure/prisma-module/__mocks__/mock-prisma-service';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { ArticleRepository } from './article.repository';
 
 describe('ArticleRepository', () => {
   let repository: ArticleRepository;
-  let mockPrisma: MockPrisma;
+  let mockPrisma: {
+    article: {
+      findMany: jest.Mock;
+      findUnique: jest.Mock;
+    };
+    articleScrap: {
+      findMany: jest.Mock;
+      count: jest.Mock;
+    };
+  };
 
   beforeEach(async () => {
-    mockPrisma = createMockPrisma();
+    mockPrisma = {
+      article: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+      },
+      articleScrap: {
+        findMany: jest.fn(),
+        count: jest.fn(),
+      },
+    };
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -25,7 +39,6 @@ describe('ArticleRepository', () => {
     }).compile();
 
     repository = moduleRef.get(ArticleRepository);
-    mockPrisma = moduleRef.get(PrismaService);
 
     jest.clearAllMocks();
   });
@@ -46,7 +59,7 @@ describe('ArticleRepository', () => {
         },
       ];
 
-      mockPrisma.article.findMany.mockResolvedValue(expectedArticles as any);
+      mockPrisma.article.findMany.mockResolvedValue(expectedArticles);
 
       const result = await repository.findManyByKeywordId(keywordId);
 
@@ -70,7 +83,6 @@ describe('ArticleRepository', () => {
   describe('findById', () => {
     it('should return article by id', async () => {
       const articleId = BigInt(1);
-      const memberId = BigInt(1);
       const expectedArticle = {
         id: BigInt(1),
         title: 'Test Article',
@@ -79,15 +91,15 @@ describe('ArticleRepository', () => {
         summary: 'Test Summary',
         scrapCount: BigInt(5),
         views: BigInt(100),
-        keywordId: BigInt(1),
-        ArticleSrap: {
-          memberId: 1,
+        keyword: {
+          id: BigInt(1),
+          name: 'Test Keyword',
         },
       };
 
-      mockPrisma.article.findUnique.mockResolvedValue(expectedArticle as any);
+      mockPrisma.article.findUnique.mockResolvedValue(expectedArticle);
 
-      const result = await repository.findById(articleId, memberId);
+      const result = await repository.findById(articleId);
 
       expect(result).toEqual(expectedArticle);
       expect(mockPrisma.article.findUnique).toHaveBeenCalledWith({
@@ -95,19 +107,16 @@ describe('ArticleRepository', () => {
           id: true,
           content: true,
           publishedAt: true,
-          keywordId: true,
+          keyword: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           scrapCount: true,
           summary: true,
           title: true,
           views: true,
-          ArticleScrap: {
-            select: {
-              id: true,
-            },
-            where: {
-              memberId,
-            },
-          },
         },
         where: {
           id: articleId,
@@ -118,11 +127,10 @@ describe('ArticleRepository', () => {
 
     it('should return null when article not found', async () => {
       const articleId = BigInt(999);
-      const memberId = BigInt(1);
 
       mockPrisma.article.findUnique.mockResolvedValue(null);
 
-      const result = await repository.findById(articleId, memberId);
+      const result = await repository.findById(articleId);
 
       expect(result).toBeNull();
       expect(mockPrisma.article.findUnique).toHaveBeenCalledWith({
@@ -130,19 +138,16 @@ describe('ArticleRepository', () => {
           id: true,
           content: true,
           publishedAt: true,
-          keywordId: true,
+          keyword: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           scrapCount: true,
           summary: true,
           title: true,
           views: true,
-          ArticleScrap: {
-            select: {
-              id: true,
-            },
-            where: {
-              memberId,
-            },
-          },
         },
         where: {
           id: articleId,
@@ -171,7 +176,16 @@ describe('ArticleRepository', () => {
             summary: 'Summary 1',
             scrapCount: BigInt(5),
             views: BigInt(100),
-            keywordId: BigInt(1),
+            keyword: {
+              id: BigInt(1),
+              description: 'Keyword 1 description',
+              name: 'Keyword 1',
+              todaysKeyword: [
+                {
+                  date: new Date(),
+                },
+              ],
+            },
           },
         },
         {
@@ -183,16 +197,23 @@ describe('ArticleRepository', () => {
             summary: 'Summary 2',
             scrapCount: BigInt(3),
             views: BigInt(50),
-            keywordId: BigInt(2),
+            keyword: {
+              id: BigInt(2),
+              description: 'Keyword 2 description',
+              name: 'Keyword 2',
+              todaysKeyword: [
+                {
+                  date: new Date(),
+                },
+              ],
+            },
           },
         },
       ];
 
       const totalElements = 2;
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue(
-        mockArticleScraps as any,
-      );
+      mockPrisma.articleScrap.findMany.mockResolvedValue(mockArticleScraps);
       mockPrisma.articleScrap.count.mockResolvedValue(totalElements);
 
       const result = await repository.findArticleScraps(memberId, pageAble);
@@ -206,7 +227,29 @@ describe('ArticleRepository', () => {
 
       expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: true,
+          article: {
+            select: {
+              id: true,
+              content: true,
+              publishedAt: true,
+              summary: true,
+              title: true,
+              scrapCount: true,
+              views: true,
+              keyword: {
+                select: {
+                  id: true,
+                  description: true,
+                  name: true,
+                  todaysKeyword: {
+                    select: {
+                      date: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           memberId,
@@ -244,16 +287,23 @@ describe('ArticleRepository', () => {
             summary: 'Summary 3',
             scrapCount: BigInt(2),
             views: BigInt(30),
-            keywordId: BigInt(3),
+            keyword: {
+              id: BigInt(3),
+              description: 'Keyword 3 description',
+              name: 'Keyword 3',
+              todaysKeyword: [
+                {
+                  date: new Date(),
+                },
+              ],
+            },
           },
         },
       ];
 
       const totalElements = 11;
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue(
-        mockArticleScraps as any,
-      );
+      mockPrisma.articleScrap.findMany.mockResolvedValue(mockArticleScraps);
       mockPrisma.articleScrap.count.mockResolvedValue(totalElements);
 
       const result = await repository.findArticleScraps(memberId, pageAble);
@@ -267,7 +317,29 @@ describe('ArticleRepository', () => {
 
       expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: true,
+          article: {
+            select: {
+              id: true,
+              content: true,
+              publishedAt: true,
+              summary: true,
+              title: true,
+              scrapCount: true,
+              views: true,
+              keyword: {
+                select: {
+                  id: true,
+                  description: true,
+                  name: true,
+                  todaysKeyword: {
+                    select: {
+                      date: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           memberId,
@@ -289,14 +361,36 @@ describe('ArticleRepository', () => {
         sortDirection: 'desc' as const,
       };
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue([] as any);
+      mockPrisma.articleScrap.findMany.mockResolvedValue([]);
       mockPrisma.articleScrap.count.mockResolvedValue(0);
 
       await repository.findArticleScraps(memberId, pageAble);
 
       expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: true,
+          article: {
+            select: {
+              id: true,
+              content: true,
+              publishedAt: true,
+              summary: true,
+              title: true,
+              scrapCount: true,
+              views: true,
+              keyword: {
+                select: {
+                  id: true,
+                  description: true,
+                  name: true,
+                  todaysKeyword: {
+                    select: {
+                      date: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         where: {
           memberId,
@@ -320,7 +414,7 @@ describe('ArticleRepository', () => {
         sortDirection: 'desc' as const,
       };
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue([] as any);
+      mockPrisma.articleScrap.findMany.mockResolvedValue([]);
       mockPrisma.articleScrap.count.mockResolvedValue(0);
 
       const result = await repository.findArticleScraps(memberId, pageAble);

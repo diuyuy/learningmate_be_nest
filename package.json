@@ -114,6 +114,9 @@
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1",
       "^generated/prisma$": "<rootDir>/../generated/prisma"
-    }
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!.*(superjson|copy-anything|is-what|uuid))"
+    ]
   }
 }

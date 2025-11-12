@@ -67,7 +67,7 @@ export class ArticleRepository {
   async findArticleScraps(
     memberId: bigint,
     pageAble: Pageable<ArticleScrapSortOption>,
-  ) {
+  ): Promise<PageResponse<ScrappedArticleResponseDto>> {
     const [articleScraps, totalElements] = await Promise.all([
       this.prismaService.articleScrap.findMany({
         select: {
