@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { CACHE_PREFIX } from 'src/core/constants/cache-prfix';
+import { CacheService } from 'src/core/infrastructure/io-redis/cache.service';
 import { KeywordSortOption, Pageable } from 'src/core/types/types';
 import { ArticleService } from '../article/article.service';
 import { UpdateArticleDto } from '../article/dto/update-article.dto';
 import { UpdateKeywordDto } from '../keyword/dto';
 import { KeywordService } from '../keyword/keyword.service';
+import { QuizResponseDto } from '../quiz/dto/quiz-response.dto';
 import { UpdateQuizRequestDto } from '../quiz/dto/update-quiz-request.dto';
 import { QuizService } from '../quiz/quiz.service';
 import { VideoService } from '../video/video.service';
@@ -17,6 +20,7 @@ export class AdminService {
     private readonly videoService: VideoService,
     private readonly quizService: QuizService,
     private readonly batchService: BatchService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async findKeywords(
@@ -48,6 +52,9 @@ export class AdminService {
   }
 
   async updateArticle(articleId: bigint, updateArtilceDto: UpdateArticleDto) {
+    await this.cacheService.invalidate(
+      this.cacheService.generateCacheKey(CACHE_PREFIX.ARTICLE, { articleId }),
+    );
     return this.articleService.updateArticle(articleId, updateArtilceDto);
   }
 
@@ -59,7 +66,10 @@ export class AdminService {
     return this.videoService.updateVideo(videoId, link);
   }
 
-  async updateQuiz(quizId: bigint, updateQuizRequestDto: UpdateQuizRequestDto) {
+  async updateQuiz(
+    quizId: bigint,
+    updateQuizRequestDto: UpdateQuizRequestDto,
+  ): Promise<QuizResponseDto> {
     return this.quizService.updateQuiz(quizId, updateQuizRequestDto);
   }
 }

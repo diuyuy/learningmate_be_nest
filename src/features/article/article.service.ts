@@ -46,7 +46,6 @@ export class ArticleService {
     const article = await this.cacheService.withCaching({
       cacheKey: this.cacheService.generateCacheKey(CACHE_PREFIX.ARTICLE, {
         articleId: id,
-        memberId,
       }),
       fetchFn: async () => this.articleRepository.findById(id),
       ttlSeconds: 3600,
