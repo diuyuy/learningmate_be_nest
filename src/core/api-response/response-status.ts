@@ -29,6 +29,8 @@ export enum ResponseCode {
   INVALID_TOKEN = 'INVALID_TOKEN',
   ACCESS_TOKEN_EXPIRED = 'ACCESS_TOKEN_EXPIRED',
   GOOGLE_OAUTH_FAILURE = 'GOOGLE_OAUTH_FAILURE',
+  NAVER_OAUTH_FAILURE = 'NAVER_OAUTH_FAILURE',
+  KAKAO_OAUTH_FAILURE = 'KAKAO_OAUTH_FAILURE',
 
   // 403 Forbidden
   FORBIDDEN = 'FORBIDDEN',
@@ -181,6 +183,14 @@ export class ResponseStatusFactory {
     [ResponseCode.GOOGLE_OAUTH_FAILURE]: {
       status: HttpStatus.UNAUTHORIZED,
       message: '구글 로그인 인증이 실패했습니다.',
+    },
+    [ResponseCode.NAVER_OAUTH_FAILURE]: {
+      status: HttpStatus.UNAUTHORIZED,
+      message: '네이버 로그인 인증이 실패했습니다.',
+    },
+    [ResponseCode.KAKAO_OAUTH_FAILURE]: {
+      status: HttpStatus.UNAUTHORIZED,
+      message: '카카오 로그인 인증이 실패했습니다.',
     },
 
     // 403 Forbidden

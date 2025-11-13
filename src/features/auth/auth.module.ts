@@ -12,10 +12,14 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GoogleOauthAuthGuard } from './guards/google-oauth-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { KakaoOauthGuard } from './guards/kakao-oauth-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { NaverOauthAuthGuard } from './guards/naver-oauth-auth.guard';
 import { GoogleOauthStrategy } from './strategy/google-oauth-strategy';
 import { JwtStrategy } from './strategy/jwt-strategy';
+import { KakaoOauthStrategy } from './strategy/kakao-oauth-strategy';
 import { LocalStrategy } from './strategy/local-strategy';
+import { NaverOauthStrategy } from './strategy/naver-oauth-strategy';
 
 @Module({
   imports: [
@@ -46,6 +50,10 @@ import { LocalStrategy } from './strategy/local-strategy';
     AuthService,
     GoogleOauthStrategy,
     GoogleOauthAuthGuard,
+    NaverOauthStrategy,
+    NaverOauthAuthGuard,
+    KakaoOauthStrategy,
+    KakaoOauthGuard,
     JwtStrategy,
     LocalStrategy,
     LocalAuthGuard,

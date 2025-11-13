@@ -26,6 +26,12 @@ export const envSchema = z.object({
   [ENV_KEYS.AWS_SECRET_ACCESS_KEY]: z.string().nonempty(),
   [ENV_KEYS.AWS_S3_BUCKET]: z.string().nonempty(),
   [ENV_KEYS.CLOUDFRONT_DOMAIN]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_NAVER_CLIENT_ID]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_NAVER_SECRET]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_NAVER_REDIRECT_URL]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_KAKAO_CLIENT_ID]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_KAKAO_SECRET]: z.string().nonempty(),
+  [ENV_KEYS.AUTH_KAKAO_REDIRECT_URL]: z.string().nonempty(),
 });
 
 export const validateEnv = (config: Record<string, unknown>) => {
