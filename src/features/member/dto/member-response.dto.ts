@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Member } from 'generated/prisma';
+import { Member } from 'generated/prisma/client';
 
 export class MemberResponseDto {
   @ApiProperty({

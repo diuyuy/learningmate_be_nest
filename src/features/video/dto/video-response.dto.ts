@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Video } from 'generated/prisma';
+import { Video } from 'generated/prisma/client';
 
 export class VideoResponseDto {
   @ApiProperty({ description: '영상 ID', type: Number })

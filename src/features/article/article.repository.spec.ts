@@ -10,7 +10,7 @@ describe('ArticleRepository', () => {
       findMany: jest.Mock;
       findUnique: jest.Mock;
     };
-    articleScrap: {
+    article_scrap: {
       findMany: jest.Mock;
       count: jest.Mock;
     };
@@ -22,7 +22,7 @@ describe('ArticleRepository', () => {
         findMany: jest.fn(),
         findUnique: jest.fn(),
       },
-      articleScrap: {
+      article_scrap: {
         findMany: jest.fn(),
         count: jest.fn(),
       },
@@ -91,7 +91,7 @@ describe('ArticleRepository', () => {
         summary: 'Test Summary',
         scrapCount: BigInt(5),
         views: BigInt(100),
-        keyword: {
+        Keyword: {
           id: BigInt(1),
           name: 'Test Keyword',
         },
@@ -107,7 +107,7 @@ describe('ArticleRepository', () => {
           id: true,
           content: true,
           publishedAt: true,
-          keyword: {
+          Keyword: {
             select: {
               id: true,
               name: true,
@@ -138,7 +138,7 @@ describe('ArticleRepository', () => {
           id: true,
           content: true,
           publishedAt: true,
-          keyword: {
+          Keyword: {
             select: {
               id: true,
               name: true,
@@ -168,7 +168,7 @@ describe('ArticleRepository', () => {
 
       const mockArticleScraps = [
         {
-          article: {
+          Article: {
             id: BigInt(1),
             title: 'Article 1',
             content: 'Content 1',
@@ -176,11 +176,11 @@ describe('ArticleRepository', () => {
             summary: 'Summary 1',
             scrapCount: BigInt(5),
             views: BigInt(100),
-            keyword: {
+            Keyword: {
               id: BigInt(1),
               description: 'Keyword 1 description',
               name: 'Keyword 1',
-              todaysKeyword: [
+              TodaysKeyword: [
                 {
                   date: new Date(),
                 },
@@ -189,7 +189,7 @@ describe('ArticleRepository', () => {
           },
         },
         {
-          article: {
+          Article: {
             id: BigInt(2),
             title: 'Article 2',
             content: 'Content 2',
@@ -197,11 +197,11 @@ describe('ArticleRepository', () => {
             summary: 'Summary 2',
             scrapCount: BigInt(3),
             views: BigInt(50),
-            keyword: {
+            Keyword: {
               id: BigInt(2),
               description: 'Keyword 2 description',
               name: 'Keyword 2',
-              todaysKeyword: [
+              TodaysKeyword: [
                 {
                   date: new Date(),
                 },
@@ -213,8 +213,8 @@ describe('ArticleRepository', () => {
 
       const totalElements = 2;
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue(mockArticleScraps);
-      mockPrisma.articleScrap.count.mockResolvedValue(totalElements);
+      mockPrisma.article_scrap.findMany.mockResolvedValue(mockArticleScraps);
+      mockPrisma.article_scrap.count.mockResolvedValue(totalElements);
 
       const result = await repository.findArticleScraps(memberId, pageAble);
 
@@ -225,9 +225,9 @@ describe('ArticleRepository', () => {
       expect(result.hasNext).toBe(false);
       expect(result.totalPages).toBe(1);
 
-      expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.article_scrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: {
+          Article: {
             select: {
               id: true,
               content: true,
@@ -236,12 +236,12 @@ describe('ArticleRepository', () => {
               title: true,
               scrapCount: true,
               views: true,
-              keyword: {
+              Keyword: {
                 select: {
                   id: true,
                   description: true,
                   name: true,
-                  todaysKeyword: {
+                  TodaysKeyword: {
                     select: {
                       date: true,
                     },
@@ -252,7 +252,7 @@ describe('ArticleRepository', () => {
           },
         },
         where: {
-          memberId,
+          member_id: memberId,
         },
         skip: 0,
         take: 10,
@@ -261,9 +261,9 @@ describe('ArticleRepository', () => {
         },
       });
 
-      expect(mockPrisma.articleScrap.count).toHaveBeenCalledWith({
+      expect(mockPrisma.article_scrap.count).toHaveBeenCalledWith({
         where: {
-          memberId,
+          member_id: memberId,
         },
       });
     });
@@ -279,7 +279,7 @@ describe('ArticleRepository', () => {
 
       const mockArticleScraps = [
         {
-          article: {
+          Article: {
             id: BigInt(3),
             title: 'Article 3',
             content: 'Content 3',
@@ -287,11 +287,11 @@ describe('ArticleRepository', () => {
             summary: 'Summary 3',
             scrapCount: BigInt(2),
             views: BigInt(30),
-            keyword: {
+            Keyword: {
               id: BigInt(3),
               description: 'Keyword 3 description',
               name: 'Keyword 3',
-              todaysKeyword: [
+              TodaysKeyword: [
                 {
                   date: new Date(),
                 },
@@ -303,8 +303,8 @@ describe('ArticleRepository', () => {
 
       const totalElements = 11;
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue(mockArticleScraps);
-      mockPrisma.articleScrap.count.mockResolvedValue(totalElements);
+      mockPrisma.article_scrap.findMany.mockResolvedValue(mockArticleScraps);
+      mockPrisma.article_scrap.count.mockResolvedValue(totalElements);
 
       const result = await repository.findArticleScraps(memberId, pageAble);
 
@@ -315,9 +315,9 @@ describe('ArticleRepository', () => {
       expect(result.hasNext).toBe(false);
       expect(result.totalPages).toBe(2);
 
-      expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.article_scrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: {
+          Article: {
             select: {
               id: true,
               content: true,
@@ -326,12 +326,12 @@ describe('ArticleRepository', () => {
               title: true,
               scrapCount: true,
               views: true,
-              keyword: {
+              Keyword: {
                 select: {
                   id: true,
                   description: true,
                   name: true,
-                  todaysKeyword: {
+                  TodaysKeyword: {
                     select: {
                       date: true,
                     },
@@ -342,7 +342,7 @@ describe('ArticleRepository', () => {
           },
         },
         where: {
-          memberId,
+          member_id: memberId,
         },
         skip: 10,
         take: 10,
@@ -361,14 +361,14 @@ describe('ArticleRepository', () => {
         sortDirection: 'desc' as const,
       };
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue([]);
-      mockPrisma.articleScrap.count.mockResolvedValue(0);
+      mockPrisma.article_scrap.findMany.mockResolvedValue([]);
+      mockPrisma.article_scrap.count.mockResolvedValue(0);
 
       await repository.findArticleScraps(memberId, pageAble);
 
-      expect(mockPrisma.articleScrap.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.article_scrap.findMany).toHaveBeenCalledWith({
         select: {
-          article: {
+          Article: {
             select: {
               id: true,
               content: true,
@@ -377,12 +377,12 @@ describe('ArticleRepository', () => {
               title: true,
               scrapCount: true,
               views: true,
-              keyword: {
+              Keyword: {
                 select: {
                   id: true,
                   description: true,
                   name: true,
-                  todaysKeyword: {
+                  TodaysKeyword: {
                     select: {
                       date: true,
                     },
@@ -393,12 +393,12 @@ describe('ArticleRepository', () => {
           },
         },
         where: {
-          memberId,
+          member_id: memberId,
         },
         skip: 0,
         take: 10,
         orderBy: {
-          article: {
+          Article: {
             scrapCount: 'desc',
           },
         },
@@ -414,8 +414,8 @@ describe('ArticleRepository', () => {
         sortDirection: 'desc' as const,
       };
 
-      mockPrisma.articleScrap.findMany.mockResolvedValue([]);
-      mockPrisma.articleScrap.count.mockResolvedValue(0);
+      mockPrisma.article_scrap.findMany.mockResolvedValue([]);
+      mockPrisma.article_scrap.count.mockResolvedValue(0);
 
       const result = await repository.findArticleScraps(memberId, pageAble);
 
@@ -438,7 +438,7 @@ describe('ArticleRepository', () => {
       const result = repository.orderOption(pageAble);
 
       expect(result).toEqual({
-        article: {
+        Article: {
           scrapCount: 'desc',
         },
       });
@@ -470,7 +470,7 @@ describe('ArticleRepository', () => {
       const resultDesc = repository.orderOption(pageAbleDesc);
 
       expect(resultDesc).toEqual({
-        article: {
+        Article: {
           views: 'desc',
         },
       });

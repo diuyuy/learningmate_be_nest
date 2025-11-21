@@ -61,7 +61,13 @@ export class PageReviewCountResponseDto {
   }
 
   static from(this: void, review: ReviewFromPrisma) {
-    const { member, article, _count, likeReview, ...rest } = review;
+    const {
+      Member: member,
+      Article: article,
+      _count,
+      LikeReview: likeReview,
+      ...rest
+    } = review;
     return new PageReviewCountResponseDto({
       ...rest,
       memberId: member.id,
@@ -69,7 +75,7 @@ export class PageReviewCountResponseDto {
       imageUrl: member.imageUrl,
       articleId: article.id,
       title: article.title,
-      likeCount: BigInt(_count.likeReview),
+      likeCount: BigInt(_count.LikeReview),
       likedByMe: !!likeReview.length,
     });
   }

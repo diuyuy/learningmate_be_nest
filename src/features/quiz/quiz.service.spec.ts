@@ -265,7 +265,7 @@ describe('QuizService', () => {
         question4: 'Option 4',
         answer: '1',
         explanation: 'Test explanation',
-        article: {
+        Article: {
           id: articleId,
           keywordId: 1n,
         },
@@ -316,7 +316,7 @@ describe('QuizService', () => {
         question4: 'Option 4',
         answer: '1',
         explanation: 'Test explanation',
-        article: {
+        Article: {
           id: articleId,
           keywordId: 1n,
         },
@@ -365,7 +365,7 @@ describe('QuizService', () => {
         question4: 'Option 4',
         answer: '1',
         explanation: 'Test explanation',
-        article: {
+        Article: {
           id: articleId,
           keywordId: 1n,
         },
@@ -443,7 +443,7 @@ describe('QuizService', () => {
         question4: 'Option 4',
         answer: '1',
         explanation: 'Test explanation',
-        article: {
+        Article: {
           id: 999n,
           keywordId: 1n,
         },

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Study } from 'generated/prisma';
+import { Study } from 'generated/prisma/client';
 import { STUDY_FLAGS } from 'src/core/constants/study-flag';
 
 export class MyStudyResponseDto {

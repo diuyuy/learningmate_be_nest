@@ -9,19 +9,19 @@ export type ReviewFromPrisma = {
   id: bigint;
   createdAt: Date;
   content1: string;
-  member: {
+  Member: {
     id: bigint;
     nickname: string | null;
     imageUrl: string | null;
   };
-  article: {
+  Article: {
     id: bigint;
     title: string;
   };
-  likeReview: {
+  LikeReview: {
     memberId: bigint;
   }[];
   _count: {
-    likeReview: number;
+    LikeReview: number;
   };
 };

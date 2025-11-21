@@ -61,8 +61,11 @@ export class ArticleService {
       memberId,
     );
 
+    const { Keyword: keyword, ...articleProps } = article;
+
     return ArticleDetailResponseDto.from({
-      ...article,
+      keyword,
+      ...articleProps,
       scrappedByMe,
     });
   }

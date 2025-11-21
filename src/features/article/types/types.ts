@@ -6,11 +6,11 @@ export type ScrappedArticleFromPrismaDto = {
   publishedAt: Date;
   scrapCount: bigint;
   views: bigint;
-  keyword: {
+  Keyword: {
     description: string;
     name: string;
     id: bigint;
-    todaysKeyword: {
+    TodaysKeyword: {
       date: Date;
     }[];
   };

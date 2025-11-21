@@ -34,7 +34,7 @@ export class KeywordService {
           select: {
             id: true,
             date: true,
-            keyword: true,
+            Keyword: true,
           },
           where: {
             date: {
@@ -112,7 +112,7 @@ export class KeywordService {
 
     const keyword = await this.prismaService.keyword.update({
       data: {
-        category: {
+        Category: {
           update: {
             data: {
               id: category.id,
@@ -159,7 +159,7 @@ export class KeywordService {
     if (query === '') {
       return category !== 'all'
         ? {
-            category: {
+            Category: {
               name: category,
             },
           }
@@ -176,7 +176,7 @@ export class KeywordService {
     return category === 'all'
       ? searchCondition
       : {
-          AND: [searchCondition, { category: { name: category } }],
+          AND: [searchCondition, { Category: { name: category } }],
         };
   }
 }

@@ -80,12 +80,12 @@ export class ArticleRepository {
               title: true,
               scrapCount: true,
               views: true,
-              keyword: {
+              Keyword: {
                 select: {
                   id: true,
                   description: true,
                   name: true,
-                  todaysKeyword: {
+                  TodaysKeyword: {
                     select: {
                       date: true,
                     },
@@ -102,42 +102,42 @@ export class ArticleRepository {
         take: pageAble.size,
         orderBy: this.orderOption(pageAble),
       }),
-      this.prismaService.articleScrap.count({
+      this.prismaService.article_scrap.count({
         where: {
-          memberId,
+          member_id: memberId,
         },
       }),
     ]);
 
-    const articles = articleScraps.map(({ article }) =>
-      ScrappedArticleResponseDto.from({ ...article, scrappedByMe: true }),
+    const articles = articleScraps.map(({ Article }) =>
+      ScrappedArticleResponseDto.from({ ...Article, scrappedByMe: true }),
     );
 
     return PageResponse.from(articles, totalElements, pageAble);
   }
 
   async scrapArticle(memberId: bigint, articleId: bigint) {
-    await this.prismaService.articleScrap.upsert({
+    await this.prismaService.article_scrap.upsert({
       create: {
-        articleId,
-        memberId,
+        article_id: articleId,
+        member_id: memberId,
       },
       update: {},
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
   }
 
   async cancelScrap(memberId: bigint, articleId: bigint) {
-    await this.prismaService.articleScrap.delete({
+    await this.prismaService.article_scrap.delete({
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
@@ -157,7 +157,7 @@ export class ArticleRepository {
   orderOption(pageAble: Pageable<ArticleScrapSortOption>) {
     if (pageAble.sortProp === 'scrapCounts') {
       return {
-        article: {
+        Article: {
           scrapCount: pageAble.sortDirection,
         },
       };
@@ -165,7 +165,7 @@ export class ArticleRepository {
 
     if (pageAble.sortProp === 'viewsCounts') {
       return {
-        article: {
+        Article: {
           views: pageAble.sortDirection,
         },
       };
