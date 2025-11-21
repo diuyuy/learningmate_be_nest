@@ -31,7 +31,7 @@ export class ArticleRepository {
         id: true,
         content: true,
         publishedAt: true,
-        keyword: {
+        Keyword: {
           select: {
             id: true,
             name: true,
@@ -49,14 +49,14 @@ export class ArticleRepository {
   }
 
   async isScrappedByMember(articleId: bigint, memberId: bigint) {
-    const articleScrap = await this.prismaService.articleScrap.findUnique({
+    const articleScrap = await this.prismaService.article_scrap.findUnique({
       select: {
         id: true,
       },
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
@@ -69,9 +69,9 @@ export class ArticleRepository {
     pageAble: Pageable<ArticleScrapSortOption>,
   ): Promise<PageResponse<ScrappedArticleResponseDto>> {
     const [articleScraps, totalElements] = await Promise.all([
-      this.prismaService.articleScrap.findMany({
+      this.prismaService.article_scrap.findMany({
         select: {
-          article: {
+          Article: {
             select: {
               id: true,
               content: true,
@@ -96,7 +96,7 @@ export class ArticleRepository {
           },
         },
         where: {
-          memberId,
+          member_id: memberId,
         },
         skip: pageAble.page * pageAble.size,
         take: pageAble.size,
