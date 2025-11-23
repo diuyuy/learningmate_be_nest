@@ -4,7 +4,7 @@
 
 **🔗 Demo**: [https://learningmate.cloud](https://learningmate.cloud)
 
-## 프로젝트 설명
+## Project Description
 
 경제 용어 학습을 돕는 AI 기반 학습 플랫폼입니다. 매일 새로운 경제 용어와 관련 학습 콘텐츠(동영상, AI 생성 아티클, 퀴즈)를 제공하여 경제 지식을 체계적으로 쌓을 수 있도록 돕습니다.
 
@@ -14,7 +14,7 @@
 
 해당 프로젝트는 기존 3인 팀으로 개발했던 Spring Boot 코드를 기반으로 마이그레이션한 프로젝트이며, NestJS로의 마이그레이션 및 기능 확장은 모두 혼자서 진행했습니다.
 
-## 서버 아키텍처
+## Server Architecture
 
 ![alt text](./README/images/architecture.png)
 
@@ -46,7 +46,7 @@
 - 객체 스토리지
 - CDN
 
-## 기술 스택
+## Tech Stack
 
 - **Backend**: NestJS, TypeScript, Prisma, Passport.js, Zod, Swagger, Jest
 - **Database**: MySQL, Redis
@@ -54,7 +54,7 @@
 - **External APIs**: Brave Search API, LLM API
 - **Infrastructure**: Nginx, Docker, AWS EC2, AWS ECR, AWS S3
 
-## 프로젝트 구조
+## Project Structure
 
 ```text
 src/
@@ -88,7 +88,7 @@ src/
 └── main.ts                   # 애플리케이션 진입점
 ```
 
-## 주요 기능
+## Key Features
 
 ### 학습 기능
 
@@ -108,7 +108,7 @@ src/
 - **콘텐츠 관리**: 경제 키워드, 아티클, 퀴즈 관리
 - **배치 작업**: 일일 콘텐츠 생성
 
-## 주요 기능 구현 세부사항
+## Implementation Details
 
 ### 1. 사용자 인증 시스템
 
