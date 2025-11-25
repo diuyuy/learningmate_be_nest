@@ -10,12 +10,10 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class BigIntInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-    return next
-      .handle()
-      .pipe(map((data) => this.convertBigIntsToStrings(data)));
+    return next.handle().pipe(map((data) => this.convertBigIntsToNumber(data)));
   }
 
-  private convertBigIntsToStrings(data: unknown): unknown {
+  private convertBigIntsToNumber(data: unknown): unknown {
     if (data === null || data === undefined) {
       return data;
     }
@@ -25,7 +23,7 @@ export class BigIntInterceptor implements NestInterceptor {
     }
 
     if (Array.isArray(data)) {
-      return data.map((item) => this.convertBigIntsToStrings(item));
+      return data.map((item) => this.convertBigIntsToNumber(item));
     }
 
     if (data instanceof Date) {
@@ -35,7 +33,7 @@ export class BigIntInterceptor implements NestInterceptor {
     if (typeof data === 'object') {
       const result: object = {};
       Object.keys(data).forEach((key) => {
-        result[key] = this.convertBigIntsToStrings(data[key]);
+        result[key] = this.convertBigIntsToNumber(data[key]);
       });
 
       return result;

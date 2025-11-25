@@ -39,7 +39,9 @@ import {
   SignUpRequestDto,
 } from './dto';
 import { GoogleOauthAuthGuard } from './guards/google-oauth-auth.guard';
+import { KakaoOauthGuard } from './guards/kakao-oauth-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { NaverOauthAuthGuard } from './guards/naver-oauth-auth.guard';
 import type { RequestWithUser } from './types/request-with-user';
 
 @ApiTags('Auth')
@@ -61,12 +63,60 @@ export class AuthController {
   googleOauthRequest() {}
 
   @ApiOperation({
+    summary: '네이버 OAuth 로그인 요청',
+    description: '네이버 OAuth 로그인 페이지로 리다이렉트합니다.',
+  })
+  @UseGuards(NaverOauthAuthGuard)
+  @Get('login/oauth2/naver')
+  naverOauthReqeust() {}
+
+  @ApiOperation({
+    summary: '카카오 OAuth 로그인 요청',
+    description: '카카오 OAuth 로그인 페이지로 리다이렉트합니다.',
+  })
+  @UseGuards(KakaoOauthGuard)
+  @Get('login/oauth2/kakao')
+  kakaoOauthReqeust() {}
+
+  @ApiOperation({
     summary: '구글 OAuth 콜백',
     description: '구글 OAuth 인증 후 콜백을 처리합니다.',
   })
   @UseGuards(GoogleOauthAuthGuard)
   @Get('callback/google')
   async googleOauthCallback(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.authService.signIn(
+      req.user,
+    );
+
+    this.setCookie(res, accessToken, refreshToken);
+
+    res.redirect(`${this.configService.get('AUTH_BASE_URL')}/oauth-redirect`);
+  }
+
+  @ApiOperation({
+    summary: '네이버 OAuth 콜백',
+    description: '네이버 OAuth 인증 후 콜백을 처리합니다.',
+  })
+  @UseGuards(NaverOauthAuthGuard)
+  @Get('callback/naver')
+  async naverOauthCallback(@Req() req: RequestWithUser, @Res() res: Response) {
+    const { accessToken, refreshToken } = await this.authService.signIn(
+      req.user,
+    );
+
+    this.setCookie(res, accessToken, refreshToken);
+
+    res.redirect(`${this.configService.get('AUTH_BASE_URL')}/oauth-redirect`);
+  }
+
+  @ApiOperation({
+    summary: '카카오 OAuth 콜백',
+    description: '카카오 OAuth 인증 후 콜백을 처리합니다.',
+  })
+  @UseGuards(KakaoOauthGuard)
+  @Get('callback/kakao')
+  async kakaoOauthCallback(@Req() req: RequestWithUser, @Res() res: Response) {
     const { accessToken, refreshToken } = await this.authService.signIn(
       req.user,
     );
