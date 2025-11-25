@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - bcrypt
   - msgpackr-extract
   - prisma
+  - unrs-resolver
