@@ -31,7 +31,7 @@ export class ArticleRepository {
         id: true,
         content: true,
         publishedAt: true,
-        keyword: {
+        Keyword: {
           select: {
             id: true,
             name: true,
@@ -49,14 +49,14 @@ export class ArticleRepository {
   }
 
   async isScrappedByMember(articleId: bigint, memberId: bigint) {
-    const articleScrap = await this.prismaService.articleScrap.findUnique({
+    const articleScrap = await this.prismaService.article_scrap.findUnique({
       select: {
         id: true,
       },
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
@@ -69,9 +69,9 @@ export class ArticleRepository {
     pageAble: Pageable<ArticleScrapSortOption>,
   ): Promise<PageResponse<ScrappedArticleResponseDto>> {
     const [articleScraps, totalElements] = await Promise.all([
-      this.prismaService.articleScrap.findMany({
+      this.prismaService.article_scrap.findMany({
         select: {
-          article: {
+          Article: {
             select: {
               id: true,
               content: true,
@@ -80,12 +80,12 @@ export class ArticleRepository {
               title: true,
               scrapCount: true,
               views: true,
-              keyword: {
+              Keyword: {
                 select: {
                   id: true,
                   description: true,
                   name: true,
-                  todaysKeyword: {
+                  TodaysKeyword: {
                     select: {
                       date: true,
                     },
@@ -96,48 +96,48 @@ export class ArticleRepository {
           },
         },
         where: {
-          memberId,
+          member_id: memberId,
         },
         skip: pageAble.page * pageAble.size,
         take: pageAble.size,
         orderBy: this.orderOption(pageAble),
       }),
-      this.prismaService.articleScrap.count({
+      this.prismaService.article_scrap.count({
         where: {
-          memberId,
+          member_id: memberId,
         },
       }),
     ]);
 
-    const articles = articleScraps.map(({ article }) =>
-      ScrappedArticleResponseDto.from({ ...article, scrappedByMe: true }),
+    const articles = articleScraps.map(({ Article }) =>
+      ScrappedArticleResponseDto.from({ ...Article, scrappedByMe: true }),
     );
 
     return PageResponse.from(articles, totalElements, pageAble);
   }
 
   async scrapArticle(memberId: bigint, articleId: bigint) {
-    await this.prismaService.articleScrap.upsert({
+    await this.prismaService.article_scrap.upsert({
       create: {
-        articleId,
-        memberId,
+        article_id: articleId,
+        member_id: memberId,
       },
       update: {},
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
   }
 
   async cancelScrap(memberId: bigint, articleId: bigint) {
-    await this.prismaService.articleScrap.delete({
+    await this.prismaService.article_scrap.delete({
       where: {
-        memberId_articleId: {
-          memberId,
-          articleId,
+        member_id_article_id: {
+          member_id: memberId,
+          article_id: articleId,
         },
       },
     });
@@ -157,7 +157,7 @@ export class ArticleRepository {
   orderOption(pageAble: Pageable<ArticleScrapSortOption>) {
     if (pageAble.sortProp === 'scrapCounts') {
       return {
-        article: {
+        Article: {
           scrapCount: pageAble.sortDirection,
         },
       };
@@ -165,14 +165,14 @@ export class ArticleRepository {
 
     if (pageAble.sortProp === 'viewsCounts') {
       return {
-        article: {
+        Article: {
           views: pageAble.sortDirection,
         },
       };
     }
 
     return {
-      [pageAble.sortProp]: pageAble.sortDirection,
+      created_at: pageAble.sortDirection,
     };
   }
 }

@@ -34,7 +34,7 @@ export class KeywordService {
           select: {
             id: true,
             date: true,
-            keyword: true,
+            Keyword: true,
           },
           where: {
             date: {
@@ -112,7 +112,7 @@ export class KeywordService {
 
     const keyword = await this.prismaService.keyword.update({
       data: {
-        category: {
+        Category: {
           update: {
             data: {
               id: category.id,
@@ -133,7 +133,7 @@ export class KeywordService {
   private selectKeywordDetail() {
     return {
       id: true,
-      category: {
+      Category: {
         select: {
           id: true,
           name: true,
@@ -141,12 +141,12 @@ export class KeywordService {
       },
       description: true,
       name: true,
-      todaysKeyword: {
+      TodaysKeyword: {
         select: {
           date: true,
         },
       },
-      video: {
+      Video: {
         select: {
           id: true,
           link: true,
@@ -159,7 +159,7 @@ export class KeywordService {
     if (query === '') {
       return category !== 'all'
         ? {
-            category: {
+            Category: {
               name: category,
             },
           }
@@ -176,7 +176,7 @@ export class KeywordService {
     return category === 'all'
       ? searchCondition
       : {
-          AND: [searchCondition, { category: { name: category } }],
+          AND: [searchCondition, { Category: { name: category } }],
         };
   }
 }

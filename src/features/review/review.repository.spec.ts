@@ -29,7 +29,7 @@ describe('ReviewRepository', () => {
     content2: '',
     content3: '',
     createdAt: new Date('2024-01-01'),
-    article: {
+    Article: {
       id: BigInt(1),
       keywordId: BigInt(1),
     },
@@ -148,7 +148,7 @@ describe('ReviewRepository', () => {
       expect(prismaService.review.findUnique).toHaveBeenCalledWith({
         select: repository['reviewSelect'],
         where: {
-          review_member_article: {
+          memberId_articleId: {
             articleId,
             memberId,
           },
@@ -189,7 +189,7 @@ describe('ReviewRepository', () => {
           id: true,
         },
         where: {
-          review_member_article: {
+          memberId_articleId: {
             memberId,
             articleId,
           },

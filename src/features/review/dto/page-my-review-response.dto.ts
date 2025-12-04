@@ -42,13 +42,13 @@ export class PageMyReviewResponseDto {
   }
 
   static from(this: void, review: Omit<ReviewFromPrisma, 'likeReview'>) {
-    const { member, article, _count, ...rest } = review;
+    const { Member: member, Article: article, _count, ...rest } = review;
     return new PageMyReviewResponseDto({
       ...rest,
       nickname: member.nickname,
       articleId: article.id,
       title: article.title,
-      likeCount: BigInt(_count.likeReview),
+      likeCount: BigInt(_count.LikeReview),
     });
   }
 }

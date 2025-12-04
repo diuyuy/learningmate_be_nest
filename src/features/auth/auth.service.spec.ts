@@ -9,12 +9,12 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
-import { Role } from 'generated/prisma';
 import { CommonException } from 'src/core/exception/common-exception';
 import { EmailService } from 'src/core/infrastructure/email/email.service';
 import { IoRedisService } from 'src/core/infrastructure/io-redis/io-redis.service';
 import { MemberService } from '../member/member.service';
 import { AuthService } from './auth.service';
+import { Member_role } from 'generated/prisma/enums';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -28,7 +28,7 @@ describe('AuthService', () => {
     id: BigInt(1),
     email: 'test@example.com',
     passwordHash: 'hashedPassword',
-    role: Role.USER,
+    role: Member_role.USER,
   };
 
   const mockMemberResponse = {
@@ -149,7 +149,7 @@ describe('AuthService', () => {
         id: BigInt(1),
         email: 'test@example.com',
         passwordHash: 'hashedPassword',
-        role: Role.USER,
+        role: Member_role.USER,
         nickname: null,
         imageUrl: null,
         status: true,

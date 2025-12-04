@@ -1,8 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Study } from 'generated/prisma';
 import { CommonException } from 'src/core/exception/common-exception';
 import { PrismaService } from 'src/core/infrastructure/prisma-module/prisma.service';
 import { StudyService } from './study.service';
+
+type Study = {
+  id: bigint;
+  memberId: bigint;
+  keywordId: bigint;
+  studyStats: number; // VIDEO | REVIEW | QUIZ
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 describe('StudyService', () => {
   let service: StudyService;

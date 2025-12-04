@@ -7,7 +7,7 @@
     "assets": [
       {
         "include": "core/resources/templates/*.html",
-        "outDir": "dist",
+        "outDir": "dist/src",
         "watchAssets": true
       }
     ]

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Article } from 'generated/prisma';
+import { Article } from 'generated/prisma/client';
 
 export class ArticlePreviewResponseDto {
   @ApiProperty({ description: '기사 ID', type: Number })

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Keyword } from 'generated/prisma';
+import { Keyword } from 'generated/prisma/client';
 
 export class KeywordResponseDto {
   @ApiProperty({ description: '키워드 ID', type: Number })
