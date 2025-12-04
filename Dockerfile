@@ -5,20 +5,25 @@ WORKDIR /app
 # Corepack 활성화
 RUN corepack enable
 
+RUN corepack prepare yarn@latest --activate
+
 # 의존성 파일 복사
-COPY package.json pnpm-lock.yaml ./
+COPY package.json yarn.lock .yarnrc.yml ./
 
 # 의존성 설치
-RUN pnpm install --frozen-lockfile
+RUN yarn install --immutable
 
 # 소스 코드 복사
 COPY . .
 
+# 임시 환경 변수 추가
+ENV DATABASE_URL="mysql://user:password@localhost:3306/dummydb"
+
 # prisma generate
-RUN pnpm db:gen
+RUN yarn db:gen
 
 # NestJS 빌드
-RUN pnpm build
+RUN yarn build
 
 # =============================================
 # 2. 배포 단계 (Production Stage)
@@ -30,14 +35,16 @@ WORKDIR /app
 # Corepack 활성화
 RUN corepack enable
 
+RUN corepack prepare yarn@latest --activate
+
 # package 파일 복사
-COPY package.json pnpm-lock.yaml ./
+COPY package.json yarn.lock .yarnrc.yml ./
 
 # Prisma schema 파일 복사
 COPY --from=builder /app/prisma ./prisma
 
-# 프로덕션 의존성 설치 (postinstall 스크립트 무시)
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+# 프로덕션 의존성 설치
+RUN yarn workspaces focus --production
 
 # 빌더에서 생성된 파일들 복사
 COPY --from=builder /app/dist ./dist
@@ -54,9 +61,5 @@ USER nestjs
 # 포트 노출 (애플리케이션 포트에 맞게 조정)
 EXPOSE 8080
 
-# 헬스체크 (선택사항)
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-#     CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 1
-
 # 애플리케이션 실행
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]

@@ -181,11 +181,11 @@ describe('StatisticService', () => {
     it('should return quiz statistics successfully', async () => {
       // Given
       const mockAnswers = [
-        { memberAnswer: 1, quiz: { answer: 1 } }, // 정답
-        { memberAnswer: 2, quiz: { answer: 3 } }, // 오답
-        { memberAnswer: 1, quiz: { answer: 1 } }, // 정답
-        { memberAnswer: 4, quiz: { answer: 4 } }, // 정답
-        { memberAnswer: 2, quiz: { answer: 1 } }, // 오답
+        { memberAnswer: 1, Quiz: { answer: 1 } }, // 정답
+        { memberAnswer: 2, Quiz: { answer: 3 } }, // 오답
+        { memberAnswer: 1, Quiz: { answer: 1 } }, // 정답
+        { memberAnswer: 4, Quiz: { answer: 4 } }, // 정답
+        { memberAnswer: 2, Quiz: { answer: 1 } }, // 오답
       ];
 
       prismaService.memberQuiz.findMany.mockResolvedValue(mockAnswers);
@@ -202,7 +202,7 @@ describe('StatisticService', () => {
       expect(prismaService.memberQuiz.findMany).toHaveBeenCalledWith({
         select: {
           memberAnswer: true,
-          quiz: {
+          Quiz: {
             select: {
               answer: true,
             },
@@ -231,9 +231,9 @@ describe('StatisticService', () => {
     it('should have equal correctCounts and totalCounts when all answers are correct', async () => {
       // Given
       const mockAnswers = [
-        { memberAnswer: 1, quiz: { answer: 1 } },
-        { memberAnswer: 2, quiz: { answer: 2 } },
-        { memberAnswer: 3, quiz: { answer: 3 } },
+        { memberAnswer: 1, Quiz: { answer: 1 } },
+        { memberAnswer: 2, Quiz: { answer: 2 } },
+        { memberAnswer: 3, Quiz: { answer: 3 } },
       ];
 
       prismaService.memberQuiz.findMany.mockResolvedValue(mockAnswers);
@@ -251,9 +251,9 @@ describe('StatisticService', () => {
     it('should have correctCounts as 0 when all answers are incorrect', async () => {
       // Given
       const mockAnswers = [
-        { memberAnswer: 1, quiz: { answer: 2 } },
-        { memberAnswer: 2, quiz: { answer: 3 } },
-        { memberAnswer: 3, quiz: { answer: 4 } },
+        { memberAnswer: 1, Quiz: { answer: 2 } },
+        { memberAnswer: 2, Quiz: { answer: 3 } },
+        { memberAnswer: 3, Quiz: { answer: 4 } },
       ];
 
       prismaService.memberQuiz.findMany.mockResolvedValue(mockAnswers);

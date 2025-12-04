@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Keyword, TodaysKeyword } from 'generated/prisma';
+import { Keyword, TodaysKeyword } from 'generated/prisma/client';
 import { KeywordResponseDto } from './keyword-response.dto';
 
 export class TodaysKeywordResponseDto {
@@ -20,11 +20,11 @@ export class TodaysKeywordResponseDto {
 
   static from(
     this: void,
-    todaysKeyword: TodaysKeyword & { keyword: Keyword },
+    todaysKeyword: TodaysKeyword & { Keyword: Keyword },
   ): TodaysKeywordResponseDto {
     return new TodaysKeywordResponseDto({
       id: todaysKeyword.id,
-      keyword: KeywordResponseDto.from(todaysKeyword.keyword),
+      keyword: KeywordResponseDto.from(todaysKeyword.Keyword),
       date: todaysKeyword.date,
     });
   }

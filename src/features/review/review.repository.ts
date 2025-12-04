@@ -16,7 +16,7 @@ export class ReviewRepository {
 
   private readonly reviewSelect = {
     id: true,
-    article: true,
+    Article: true,
     content1: true,
     content2: true,
     content3: true,
@@ -42,7 +42,7 @@ export class ReviewRepository {
 
       await prisma.$queryRaw`
         INSERT INTO Study(memberId, keywordId, studyStats)
-          VALUES(${memberId}, ${review.article.keywordId}, ${STUDY_FLAGS.REVIEW})
+          VALUES(${memberId}, ${review.Article.keywordId}, ${STUDY_FLAGS.REVIEW})
           ON DUPLICATE KEY UPDATE
           studyStats = studyStats | ${STUDY_FLAGS.REVIEW}
       `;
@@ -55,7 +55,7 @@ export class ReviewRepository {
     return this.prismaService.review.findUnique({
       select: this.reviewSelect,
       where: {
-        review_member_article: {
+        memberId_articleId: {
           articleId,
           memberId,
         },
@@ -102,7 +102,7 @@ export class ReviewRepository {
         id: true,
       },
       where: {
-        review_member_article: {
+        memberId_articleId: {
           memberId,
           articleId,
         },
@@ -121,19 +121,19 @@ export class ReviewRepository {
         id: true,
         createdAt: true,
         content1: true,
-        member: {
+        Member: {
           select: {
             nickname: true,
           },
         },
-        article: {
+        Article: {
           select: {
             title: true,
           },
         },
         _count: {
           select: {
-            likeReview: true,
+            LikeReview: true,
           },
         },
       },
@@ -164,7 +164,7 @@ export class ReviewRepository {
     const reviews = await this.prismaService.review.findMany({
       select: this.selectPageReview(memberId),
       where: {
-        article: {
+        Article: {
           keywordId,
         },
       },
@@ -175,7 +175,7 @@ export class ReviewRepository {
 
     const totalElements = await this.prismaService.review.count({
       where: {
-        article: {
+        Article: {
           keywordId,
         },
       },
@@ -280,7 +280,7 @@ export class ReviewRepository {
   private orderOption(pageAble: Pageable<ReviewSortOption>) {
     if (pageAble.sortProp === 'likeCounts') {
       return {
-        likeReview: {
+        LikeReview: {
           _count: pageAble.sortDirection,
         },
       };
@@ -296,13 +296,13 @@ export class ReviewRepository {
       id: true,
       createdAt: true,
       content1: true,
-      article: {
+      Article: {
         select: {
           id: true,
           title: true,
         },
       },
-      member: {
+      Member: {
         select: {
           id: true,
           nickname: true,
@@ -311,10 +311,10 @@ export class ReviewRepository {
       },
       _count: {
         select: {
-          likeReview: true,
+          LikeReview: true,
         },
       },
-      likeReview: {
+      LikeReview: {
         select: {
           memberId: true,
         },

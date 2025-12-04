@@ -82,12 +82,12 @@ describe('KeywordService', () => {
         {
           id: 1n,
           date: new Date('2025-01-01'),
-          keyword: { id: 1n, name: '인플레이션' },
+          Keyword: { id: 1n, name: '인플레이션' },
         },
         {
           id: 2n,
           date: new Date('2025-01-02'),
-          keyword: { id: 2n, name: '금리' },
+          Keyword: { id: 2n, name: '금리' },
         },
       ];
 
@@ -195,7 +195,7 @@ describe('KeywordService', () => {
       expect(mockPrisma.keyword.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            category: {
+            Category: {
               name: category,
             },
           },
@@ -209,7 +209,7 @@ describe('KeywordService', () => {
 
       expect(mockPrisma.keyword.count).toHaveBeenCalledWith({
         where: {
-          category: {
+          Category: {
             name: category,
           },
         },
@@ -229,7 +229,7 @@ describe('KeywordService', () => {
           id: 1n,
           name: '인플레이션',
           description: '물가 상승',
-          category: { id: 1n, name: '금융' },
+          Category: { id: 1n, name: '금융' },
           todaysKeyword: [{ date: new Date('2025-01-01') }],
           video: [{ id: 1n, link: 'https://youtube.com/watch?v=123' }],
         },
@@ -282,7 +282,7 @@ describe('KeywordService', () => {
                   { name: { startsWith: query } },
                 ],
               },
-              { category: { name: category } },
+              { Category: { name: category } },
             ],
           },
           skip: 0,
@@ -304,7 +304,7 @@ describe('KeywordService', () => {
           id: 1n,
           name: '인플레이션',
           description: '물가 상승',
-          category: { id: 1n, name: '금융' },
+          Category: { id: 1n, name: '금융' },
           todaysKeyword: [],
           video: [],
         },
@@ -312,7 +312,7 @@ describe('KeywordService', () => {
           id: 2n,
           name: '금리',
           description: '이자율',
-          category: { id: 1n, name: '금융' },
+          Category: { id: 1n, name: '금융' },
           todaysKeyword: [],
           video: [],
         },
@@ -384,7 +384,7 @@ describe('KeywordService', () => {
         id: 1n,
         name: '수정된 인플레이션',
         description: '수정된 설명',
-        category: { id: 1n, name: '금융' },
+        Category: { id: 1n, name: '금융' },
         todaysKeyword: [],
         video: [],
       };
@@ -407,7 +407,7 @@ describe('KeywordService', () => {
       expect(mockPrisma.keyword.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: {
-            category: {
+            Category: {
               update: {
                 data: {
                   id: mockCategory.id,

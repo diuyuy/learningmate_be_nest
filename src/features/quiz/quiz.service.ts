@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from 'generated/prisma';
 import { PageResponse } from 'src/core/api-response/page-response';
 import {
   ResponseCode,
@@ -18,6 +17,7 @@ import {
 import { MemberQuizRequestDto } from './dto/member-quiz-request.dto';
 import { QuizResponseDto } from './dto/quiz-response.dto';
 import { UpdateQuizRequestDto } from './dto/update-quiz-request.dto';
+import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class QuizService {
@@ -122,7 +122,7 @@ export class QuizService {
         prisma,
         memberId,
         articleId,
-        quiz.article.keywordId,
+        quiz.Article.keywordId,
       );
 
       return QuizResponseDto.fromGrading(
@@ -150,7 +150,7 @@ export class QuizService {
         question4: true,
         answer: true,
         explanation: true,
-        article: {
+        Article: {
           select: {
             id: true,
             keywordId: true,
@@ -169,7 +169,7 @@ export class QuizService {
       );
     }
 
-    if (quiz.article.id !== articleId) {
+    if (quiz.Article.id !== articleId) {
       throw new CommonException(
         ResponseStatusFactory.create(ResponseCode.BAD_REQUEST),
       );
@@ -214,7 +214,7 @@ export class QuizService {
   ) {
     const solvedQuizzesCount = await prisma.memberQuiz.count({
       where: {
-        quiz: {
+        Quiz: {
           articleId,
         },
         memberId,

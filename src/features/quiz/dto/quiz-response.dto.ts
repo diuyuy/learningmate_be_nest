@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Quiz } from 'generated/prisma';
+import { Quiz } from 'generated/prisma/client';
 
 type QuizWithArticle = {
-  article: {
+  Article: {
     keywordId: bigint;
   };
   id: bigint;

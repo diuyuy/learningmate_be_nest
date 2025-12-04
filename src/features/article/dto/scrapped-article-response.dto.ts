@@ -68,7 +68,7 @@ export class ScrappedArticleResponseDto {
   static from(
     this: void,
     {
-      keyword: { todaysKeyword, ...keywordRest },
+      Keyword: { TodaysKeyword: todaysKeyword, ...keywordRest },
       ...rest
     }: ScrappedArticleFromPrismaDto & { scrappedByMe: boolean },
   ) {

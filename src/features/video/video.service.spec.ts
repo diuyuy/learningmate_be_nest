@@ -32,6 +32,7 @@ describe('VideoService', () => {
     const mockCacheService = {
       withCaching: jest.fn(),
       generateCacheKey: jest.fn(),
+      invalidateByPattern: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

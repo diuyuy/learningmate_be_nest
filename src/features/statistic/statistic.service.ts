@@ -63,7 +63,7 @@ export class StatisticService {
     const answers = await this.prismaService.memberQuiz.findMany({
       select: {
         memberAnswer: true,
-        quiz: {
+        Quiz: {
           select: {
             answer: true,
           },
@@ -75,7 +75,7 @@ export class StatisticService {
     });
 
     return {
-      correctCounts: answers.filter((v) => v.memberAnswer === v.quiz.answer)
+      correctCounts: answers.filter((v) => v.memberAnswer === v.Quiz.answer)
         .length,
       totalCounts: answers.length,
     };
