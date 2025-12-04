@@ -133,7 +133,7 @@ export class KeywordService {
   private selectKeywordDetail() {
     return {
       id: true,
-      category: {
+      Category: {
         select: {
           id: true,
           name: true,
@@ -141,12 +141,12 @@ export class KeywordService {
       },
       description: true,
       name: true,
-      todaysKeyword: {
+      TodaysKeyword: {
         select: {
           date: true,
         },
       },
-      video: {
+      Video: {
         select: {
           id: true,
           link: true,

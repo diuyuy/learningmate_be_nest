@@ -4,6 +4,12 @@ import { ENV_KEYS } from '../constants/env-keys';
 export type EnvSchema = z.infer<typeof envSchema>;
 
 export const envSchema = z.object({
+  [ENV_KEYS.DATABASE_HOST]: z.string().nonempty(),
+  [ENV_KEYS.DATABASE_PORT]: z.string().nonempty(),
+  [ENV_KEYS.DATABASE_USER]: z.string().nonempty(),
+  [ENV_KEYS.DATABASE_PASSWORD]: z.string().nonempty(),
+  [ENV_KEYS.DATABASE_NAME]: z.string().nonempty(),
+  //AUTH
   [ENV_KEYS.AUTH_SECRET]: z.string().nonempty(),
   [ENV_KEYS.AUTH_EXPIRATION_MILLS]: z.string().nonempty(),
   [ENV_KEYS.AUTH_REFRESH_TOKEN_EXPIRATION_DAYS]: z.string().nonempty(),

@@ -72,6 +72,8 @@ export class VideoService {
       },
     });
 
+    await this.cacheService.invalidateByPattern(`${CACHE_PREFIX.VIDEO}:*`);
+
     return VideoResponseDto.from(video);
   }
 }

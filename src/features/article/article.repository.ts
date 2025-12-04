@@ -172,7 +172,7 @@ export class ArticleRepository {
     }
 
     return {
-      [pageAble.sortProp]: pageAble.sortDirection,
+      created_at: pageAble.sortDirection,
     };
   }
 }

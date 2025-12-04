@@ -6,14 +6,14 @@ type KeywordFromPrisma = {
   id: bigint;
   description: string;
   name: string;
-  category: {
+  Category: {
     id: bigint;
     name: string;
   };
-  todaysKeyword: {
+  TodaysKeyword: {
     date: Date;
   }[];
-  video: {
+  Video: {
     id: bigint;
     link: string;
   }[];
@@ -75,20 +75,20 @@ export class KeywordDetailResponseDto {
     this: void,
     {
       id,
-      category,
-      video,
+      Category,
+      Video,
       description,
       name,
-      todaysKeyword,
+      TodaysKeyword,
     }: KeywordFromPrisma,
   ) {
     return new KeywordDetailResponseDto({
       id,
-      category,
-      date: todaysKeyword[0]?.date ?? null,
+      category: Category,
+      date: TodaysKeyword[0]?.date ?? null,
       description,
       name,
-      video: video[0] ?? null,
+      video: Video[0] ?? null,
     });
   }
 }
